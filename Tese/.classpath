@@ -8,6 +8,6 @@
 	<classpathentry kind="lib" path="C:/Users/Daniel/wekafiles/packages/timeseriesForecasting/pdm-timeseriesforecasting-ce-TRUNK-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Daniel/wekafiles/packages/HMM/HMM.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Daniel/wekafiles/packages/multiInstanceFilters/multiInstanceFilters.jar"/>
-	<classpathentry kind="lib" path="C:/Program Files/Weka 3.7.3/Weka-3-7/weka.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Weka-3-7/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

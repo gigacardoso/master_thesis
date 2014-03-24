@@ -31,19 +31,23 @@ public class Approach1 {
 	private String data = "C:\\hepat_data030704\\";
 	private String path = data +"data\\";
 	private String andreia = data + "andreia\\";
+	private String hmm = path + "predictionsHMM\\";
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+	private String[] examsHMM = {"ALB"};
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
+	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
 	private  int steps = 7;
 	private  int folds = 10;
 
 	public static void main(String[] args){
 		try {
 			Approach1 a = new Approach1();
-			a.predictExams(new Logistic());
-			a.evaluatePredictions();
+			//a.predictExams(new Logistic());
+			//a.evaluatePredictions();
+			a.evaluatePredictionsHMM();
 			//			a.buildDataWithPredictionsSorted();
 			//			a.buildDataWithPredictionsUnsorted();
 			//			a.ClassifyData(new NaiveBayes(), "");
@@ -75,6 +79,62 @@ public class Approach1 {
 			e.printStackTrace();
 		}
 
+
+
+	}
+
+	private void evaluatePredictionsHMM() throws IOException {
+		ArrayList<String> examsIndexes = new ArrayList<String>( Arrays.asList(indices));
+		//String[] exams = {/*"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL",*/"ALB","CHE"/*,"T-CHO","TP"*/,"Type"};//,"Activity"};
+		for(int i= 0; i<examsHMM.length;i++){
+			BufferedReader pred = new BufferedReader(new FileReader(hmm+examsHMM[i]+"_Predictions.csv"));
+			String line = null;
+			DefaultHashMap<String, String> e = new DefaultHashMap<String, String>("");
+			while((line = pred.readLine()) != null){
+				String[] split = line.split(",",-1);
+				String id = split[0];
+				String p = split[1];// "N";
+				e.put(id, p);
+			}
+			predictionsHMM.put(examsHMM[i], e);
+			pred.close();
+		}
+
+
+		BufferedReader real = new BufferedReader(new FileReader(path+"DiagnosisReal.csv"));
+		real.readLine();
+		String line;
+		HashMap<String,Integer> correct = new HashMap<String, Integer>();
+		int total = 0;
+		while((line = real.readLine()) != null){
+			String[] split = line.split(",",-1);
+			String id = split[0];
+			for(int i= 0; i<examsHMM.length;i++){
+				DefaultHashMap<String, String> e = predictionsHMM.get(examsHMM[i]);
+				if(split[5+examsIndexes.indexOf(examsHMM[i])].equals(e.get(id))){
+					Integer count = correct.get(examsHMM[i]);
+					if(count == null){
+						count = 1;
+					}else{
+						count++;
+					}
+					correct.put(examsHMM[i],count);
+				}
+			}
+			total++;
+		}
+		real.close();
+		System.out.println("\nTotal predictions ->\t" + total);
+		double average = 0;
+		DecimalFormat df = new DecimalFormat("#.##");
+		for(String exam:examsHMM){
+			System.out.println(exam);
+			Integer count = correct.get(exam);
+			double perc = ((double)count)/total *100;
+			average += perc;
+			System.out.println(exam + "\t->\t"+ /*count+" / "+ total+ "\t"+*/ df.format(perc) + " %" );
+		}
+		System.out.println("\nAverage - "+ df.format(average/examsHMM.length) + " %");
 
 
 	}
@@ -459,7 +519,7 @@ public class Approach1 {
 	}
 
 	private  void predictExams(Classifier classifier) throws IOException {
-		
+
 		//String[] exams = {/*"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL",*/"ALB"/*,"CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 		HashMap<String,HashMap<Double,String>> indexes = getIndexes(exams);
 		try{

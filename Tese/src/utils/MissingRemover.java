@@ -12,7 +12,7 @@ public class MissingRemover {
 	private static String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};	
 	private static String data = "C:\\hepat_data030704\\";
 	private static String path = data +"data\\";
-	private static String outPath = "C:\\Users\\Daniel\\Documents\\GitHub\\HMMinR\\";
+	private static String outPath = "C:\\Users\\Daniel\\Documents\\GitHub\\HMMinR\\data\\";
 
 	public static void main(String[] args) {
 		try {
@@ -25,7 +25,18 @@ public class MissingRemover {
 				String[] split;
 				while((line = in.readLine()) != null){
 					split = line.split(",");
-					if(split.length == size){
+					if(split[0].equals("307")){
+						@SuppressWarnings("unused")
+						int j = split.length; 
+					}	
+					boolean missing = false;
+					for (String string : split) {
+						if(string.equals("")){
+							missing = true;
+							break;
+						}
+					}		
+					if(!missing && split.length == size){
 						out.write(line + "\n");
 					}
 				}
