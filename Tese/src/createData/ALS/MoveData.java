@@ -80,7 +80,7 @@ public class MoveData {
 			create.DeleteFiles(baselineNoClass);
 			for(int i=0; i< steps-1;i++){
 				copyFile(new File(diagnosis + "baseline"+i+".arff"), new File(baseline + File.separator + "baseline"+i+".arff"));
-//				copyFile(new File(diagnosis + "baselineNoClass"+i+".arff"), new File(baselineNoClass + File.separator + "baselineNoClass"+i+".arff"));
+				copyFile(new File(diagnosis + "baselineNoClass"+i+".arff"), new File(baselineNoClass + File.separator + "baselineNoClass"+i+".arff"));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

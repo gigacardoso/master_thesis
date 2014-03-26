@@ -6,9 +6,7 @@ import java.util.Random;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.Logistic;
-import weka.classifiers.meta.AdaBoostM1;
-import weka.classifiers.trees.J48;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 
@@ -17,27 +15,28 @@ public class BaselineSingle {
 	private static String data = "C:\\hepat_data030704\\";
 	private static String path = data +"data\\";
 	private final static int folds = 10;
-	private final static int steps = 12;
+	private final static int steps = 7;
 
 	public static void main(String[] args) {
 		BaselineSingle b = new BaselineSingle();
 		
-//		for(int i=0;i<steps-1;i++){
-		int i= 0;
+		for(int i=0;i<steps-1;i++){
+//		int i= 0;
 			System.out.println("------------------\tBaseline "+ i + " -> " + (steps-1) + "\t------------------");
 			System.out.println("\n--------------------------\tWITH CLASS\t--------------------------------");
-			b.Classify(new NaiveBayes(), folds, "baselineSingleWith_"+i+"_", path);
-			b.Classify(new J48(), folds, "baselineSingleWith_"+i+"_", path);
-			b.Classify(new AdaBoostM1(), folds, "baselineSingleWith_"+i+"_", path);
-			b.Classify(new Logistic(), folds, "baselineSingleWith_"+i+"_", path);
-//			b.Classify(new MultilayerPerceptron(), folds, "baselineSingleWith_"+i+"_", path);
+//			b.Classify(new NaiveBayes(), folds, "baselineSingleWith_"+i+"_", path);
+//			b.Classify(new J48(), folds, "baselineSingleWith_"+i+"_", path);
+//			b.Classify(new AdaBoostM1(), folds, "baselineSingleWith_"+i+"_", path);
+//			b.Classify(new Logistic(), folds, "baselineSingleWith_"+i+"_", path);
+////			b.Classify(new MultilayerPerceptron(), folds, "baselineSingleWith_"+i+"_", path);
 			System.out.println("\n--------------------------\tWITHOUT CLASS\t--------------------------------");
-//			b.Classify(new NaiveBayes(), folds, "baselineSingleWithout_"+i+"_", path);
+			b.Classify(new NaiveBayes(), folds, "baselineSingleWithout_"+i+"_", path);
+			b.Classify(new RandomForest(), folds, "baselineSingleWithout_"+i+"_", path);
 //			b.Classify(new J48(), folds, "baselineSingleWithout_"+i+"_", path);
 //			b.Classify(new AdaBoostM1(), folds, "baselineSingleWithout_"+i+"_", path);
 //			b.Classify(new Logistic(), folds, "baselineSingleWithout_"+i+"_", path);
 //			b.Classify(new MultilayerPerceptron(), folds, "baselineSingleWithout_"+i+"_", path);
-//		}
+		}
 	}
 
 	private void Classify(Classifier classifier, int folds, String file,String path){

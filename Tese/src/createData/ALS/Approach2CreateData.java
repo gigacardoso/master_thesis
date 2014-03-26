@@ -81,7 +81,7 @@ public class Approach2CreateData {
 		String line1;
 		line1 = inSVC.readLine();
 		String[] split = line1.split(",",-1);
-		int classe = 4; // with class - 4 without- 5
+		int classe = 5; // with class - 4 without- 5
 		String[] exams = new String[split.length-classe];
 		for(int i= 0; i< exams.length; i++){
 			exams[i] = split[4+i];

@@ -16,12 +16,10 @@ import java.util.Set;
 import utils.DefaultHashMap;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.HMM;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.Logistic;
-import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Remove;
@@ -35,7 +33,8 @@ public class Approach1 {
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-	private String[] examsHMM = {"ALB"};
+	private String[] examsHMM = {"T-BIL"};
+	//private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
@@ -45,13 +44,15 @@ public class Approach1 {
 	public static void main(String[] args){
 		try {
 			Approach1 a = new Approach1();
-			//a.predictExams(new Logistic());
-			//a.evaluatePredictions();
-			a.evaluatePredictionsHMM();
-			//			a.buildDataWithPredictionsSorted();
+			a.predictExams(new J48());
+			a.evaluatePredictions();
+			//			a.evaluatePredictionsHMM();
+			a.buildDataWithPredictionsSorted();
 			//			a.buildDataWithPredictionsUnsorted();
-			//			a.ClassifyData(new NaiveBayes(), "");
-			//			a.buildConfussionMatrix("Naive Bayes", "");
+			a.ClassifyData(new NaiveBayes(), "");
+			a.buildConfussionMatrix("Naive Bayes", "");
+			a.ClassifyData(new RandomForest(), "");
+			a.buildConfussionMatrix("RandomForest", "");
 			//			J48 j48 = new J48();
 			//			j48.setMinNumObj(50);
 			//			a.ClassifyData(new J48(), "");
@@ -65,7 +66,7 @@ public class Approach1 {
 			//			a.buildConfussionMatrix("NN");
 			//			a.ClassifyData(new Logistic(), "");
 			//			a.buildConfussionMatrix("Logistic", "");
-			//						a.ClassifyData(new Logistic(), "Unsorted");
+			//			a.ClassifyData(new Logistic(), "Unsorted");
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//			a.ClassifyDiagnostic(new NaiveBayes());
@@ -128,7 +129,7 @@ public class Approach1 {
 		double average = 0;
 		DecimalFormat df = new DecimalFormat("#.##");
 		for(String exam:examsHMM){
-			System.out.println(exam);
+			//System.out.println(exam);
 			Integer count = correct.get(exam);
 			double perc = ((double)count)/total *100;
 			average += perc;

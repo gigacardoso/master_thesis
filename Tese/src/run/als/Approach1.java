@@ -13,9 +13,11 @@ import java.util.Random;
 import utils.DefaultHashMap;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.Logistic;
 import weka.classifiers.meta.FilteredClassifier;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
@@ -28,7 +30,7 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 6;
+	private  int steps = 3;
 	private  int folds = 10;
 
 	public static void main(String[] args){
@@ -38,17 +40,19 @@ public class Approach1 {
 			a.predictVitals();
 			a.predictSVC();
 			a.buildDataWithPredictions();
-//			a.evaluatePredictions();
-//						a.ClassifyData(new NaiveBayes());
-//						a.buildConfussionMatrix("Naive Bayes");
+			a.evaluatePredictions();
+						a.ClassifyData(new NaiveBayes());
+						a.buildConfussionMatrix("Naive Bayes");
+						a.ClassifyData(new RandomForest());
+						a.buildConfussionMatrix("RandomForest");
 //						a.ClassifyData(new J48());
 //						a.buildConfussionMatrix("J48");
 //						a.ClassifyData(new AdaBoostM1());
 //						a.buildConfussionMatrix("AdaBoost");
 			//			a.ClassifyData(new MultilayerPerceptron());
 			//			a.buildConfussionMatrix("NN");
-						a.ClassifyData(new Logistic());
-						a.buildConfussionMatrix("Logistic");
+//						a.ClassifyData(new Logistic());
+//						a.buildConfussionMatrix("Logistic");
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 //						a.ClassifyDiagnostic(new NaiveBayes());

@@ -6,9 +6,7 @@ import java.util.Random;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.Logistic;
-import weka.classifiers.meta.AdaBoostM1;
-import weka.classifiers.trees.J48;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
 
@@ -22,14 +20,15 @@ public class BaselineMulti {
 	public static void main(String[] args) {
 		BaselineMulti aa = new BaselineMulti();
 		System.out.println("------------------\tWITH CLASS\t------------------");
-		aa.Classify(new NaiveBayes(), folds, "baselineMultiWith");
-		aa.Classify(new J48(), folds, "baselineMultiWith");
-		aa.Classify(new AdaBoostM1(), folds, "baselineMultiWith");
-		aa.Classify(new Logistic(), folds, "baselineMultiWith");
+//		aa.Classify(new NaiveBayes(), folds, "baselineMultiWith");
+//		aa.Classify(new J48(), folds, "baselineMultiWith");
+//		aa.Classify(new AdaBoostM1(), folds, "baselineMultiWith");
+//		aa.Classify(new Logistic(), folds, "baselineMultiWith");
 //		aa.Classify(new MultilayerPerceptron(), folds, "baselineMultiWith");
 		System.out.println("----------------------------------------------------------");
 		System.out.println("------------------\tWITHOUT CLASS\t------------------");
-//		aa.Classify(new NaiveBayes(), folds, "baselineMultiWithout");
+		aa.Classify(new NaiveBayes(), folds, "baselineMultiWithout");
+		aa.Classify(new RandomForest(), folds, "baselineMultiWithout");
 //		aa.Classify(new J48(), folds, "baselineMultiWithout");
 //		aa.Classify(new AdaBoostM1(), folds, "baselineMultiWithout");
 //		aa.Classify(new MultilayerPerceptron(), folds, "baselineMultiWithout");

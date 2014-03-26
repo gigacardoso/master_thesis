@@ -44,18 +44,18 @@ public class TableGeneratorCategories {
 		}
 		try {
 			int steps = 7;
-			//			table.readExams();
-			//			table.readBiopsy();
-			//			table.readPatients();
-			//			table.createDiagnostic();
-			//			table.createDiagnosisReal(steps);
-			//			table.countTimePoints("Diagnosis.csv");
-			//			table.createApproach1PredictionData(steps);
-			//			table.createApproach2PredictionData(steps);
-			//			table.createBaselineSingleOb(steps);
-			//			table.createBaselineMultipleOb(steps);
-			//			table.convertToArff();
-			table.convertToMultiInstanceArff();
+			table.readExams();
+			table.readBiopsy();
+			table.readPatients();
+			table.createDiagnostic();
+			table.createDiagnosisReal(steps);
+			table.countTimePoints("Diagnosis.csv");
+			table.createApproach1PredictionData(steps);
+			table.createApproach2PredictionData(steps);
+			table.createBaselineSingleOb(steps);
+			table.createBaselineMultipleOb(steps);
+			table.convertToArff();
+			//table.convertToMultiInstanceArff();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -66,7 +66,7 @@ public class TableGeneratorCategories {
 	}
 
 	private void createApproach2PredictionData(int steps) throws IOException {
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity","Fibrosis"/*comment for no class*/};
+		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"/*,"Fibrosis"comment for no class*/};
 		HashMap<String,Integer> indixes = new HashMap<String, Integer>();
 		BufferedReader inFact = new BufferedReader(new FileReader(out + "Diagnosis.csv"));
 		HashMap<Integer,BufferedWriter> writers = new HashMap<Integer,BufferedWriter>();
@@ -131,7 +131,7 @@ public class TableGeneratorCategories {
 	private void outputLineExams2(String id,
 			HashMap<Integer, BufferedWriter> writers, List<List<String>> group,
 			int steps) throws IOException {
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity","Fibrosis"};
+		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"/*,"Fibrosis"*/};
 		int size = writers.keySet().size();
 		for(int i=0; i < size ; i++){
 			List<String> list = group.get(i);

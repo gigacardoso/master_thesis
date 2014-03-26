@@ -27,25 +27,25 @@ public class CreateData {
 	public static void main(String[] args) {
 		CreateData create = new CreateData();
 		try {
-			steps = 5;
-			create.diagnosticData();
-			create.diagnosticData2();
-			
-			create.alternativeApproach(steps);
-			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-			aa.createData(steps);
-			aa.createDataNoClass(steps);
-			create.approach1(steps);
-			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
-			a1.createDataSVC(steps);
-			a1.createDataVitals(steps);
+			steps = 3;
+//			create.diagnosticData();
+//			create.diagnosticData2();
+//			
+//			create.alternativeApproach(steps);
+//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
+//			aa.createData(steps);
+//			aa.createDataNoClass(steps);
+//			create.approach1(steps);
+//			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
+//			a1.createDataSVC(steps);
+//			a1.createDataVitals(steps);
 			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
 			a2.createData(steps);
-			create.baseLineWithClass();
-			create.baseLineWithoutClass();
+//			create.baseLineWithClass();
+//			create.baseLineWithoutClass();
 			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
 			move.MoveAllData(steps);
-//			create.CleanData();
+			//create.CleanData();
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
