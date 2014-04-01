@@ -17,6 +17,8 @@ import utils.DefaultHashMap;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.Logistic;
+import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
@@ -33,8 +35,8 @@ public class Approach1 {
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-	private String[] examsHMM = {"T-BIL"};
-	//private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+	//private String[] examsHMM = {"T-BIL"};
+	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
@@ -44,21 +46,19 @@ public class Approach1 {
 	public static void main(String[] args){
 		try {
 			Approach1 a = new Approach1();
-			a.predictExams(new J48());
-			a.evaluatePredictions();
-			//			a.evaluatePredictionsHMM();
-			a.buildDataWithPredictionsSorted();
+			//			a.predictExams(new J48());
+			//			a.evaluatePredictions();
+			a.evaluatePredictionsHMM();
+			//a.buildDataWithPredictionsSorted();
+			a.buildDataWithHMMPredictionsSorted();
 			//			a.buildDataWithPredictionsUnsorted();
-			a.ClassifyData(new NaiveBayes(), "");
-			a.buildConfussionMatrix("Naive Bayes", "");
-			a.ClassifyData(new RandomForest(), "");
-			a.buildConfussionMatrix("RandomForest", "");
-			//			J48 j48 = new J48();
-			//			j48.setMinNumObj(50);
-			//			a.ClassifyData(new J48(), "");
-			//			a.buildConfussionMatrix("J48","");
-			//			a.ClassifyData(j48, "Unsorted");
-			//			a.buildConfussionMatrix("J48","Unsorted");
+			a.buildDataWithHMMPredictionsUnsorted();
+			//			a.ClassifyData(new NaiveBayes(), "");
+			//			a.buildConfussionMatrix("Naive Bayes", "");
+			a.ClassifyData(new J48(), "");
+			a.buildConfussionMatrix("J48","");
+			a.ClassifyData(new J48(), "Unsorted");
+			a.buildConfussionMatrix("J48","Unsorted");
 			//			a.compareLabeled();
 			//			a.ClassifyData(new AdaBoostM1(), "");
 			//			a.buildConfussionMatrix("AdaBoost","");
@@ -66,16 +66,17 @@ public class Approach1 {
 			//			a.buildConfussionMatrix("NN");
 			//			a.ClassifyData(new Logistic(), "");
 			//			a.buildConfussionMatrix("Logistic", "");
+			//			a.ClassifyData(new RandomForest(), "");
+			//			a.buildConfussionMatrix("RandomForest", "");
 			//			a.ClassifyData(new Logistic(), "Unsorted");
 
 			System.out.println("------------------\tDiagnostic\t------------------");
-			//			a.ClassifyDiagnostic(new NaiveBayes());
-			//			j48 = new J48();
-			//			j48.setMinNumObj(50);
-			//			a.ClassifyDiagnostic(new J48());
-			//			a.ClassifyDiagnostic(new AdaBoostM1());
+			//						a.ClassifyDiagnostic(new NaiveBayes());
+
+			//						a.ClassifyDiagnostic(new J48());
+			//						a.ClassifyDiagnostic(new AdaBoostM1());
 			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
-			//			a.ClassifyDiagnostic(new Logistic());
+			//						a.ClassifyDiagnostic(new Logistic());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,6 +113,7 @@ public class Approach1 {
 			String id = split[0];
 			for(int i= 0; i<examsHMM.length;i++){
 				DefaultHashMap<String, String> e = predictionsHMM.get(examsHMM[i]);
+
 				if(split[5+examsIndexes.indexOf(examsHMM[i])].equals(e.get(id))){
 					Integer count = correct.get(examsHMM[i]);
 					if(count == null){
@@ -453,6 +455,48 @@ public class Approach1 {
 		ChangeClassPreditions("PredictionDataWithDemo");
 	}
 
+	private  void buildDataWithHMMPredictionsSorted() throws IOException {
+		System.out.println("build Data With Predictions");
+		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
+		String header = diag.readLine();
+		diag.close();
+		BufferedWriter outPredictions = new BufferedWriter(new FileWriter(path+"PredictionDataWithDemo.csv"));
+		outPredictions.write(header+ '\n');
+		String patientWith = "";
+
+		readPatients();
+
+		Set<String> keys = predictionsHMM.get(exams[0]).keySet();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		for(String key: keys){
+			ids.add(Integer.parseInt(key));
+		}
+		Collections.sort(ids);
+		//		List<String> ids = new ArrayList<String>();
+		//		ids.addAll(keys);
+		//		Collections.sort(ids);
+		for(Integer id: ids){
+			//			System.out.println(id);
+			patientWith = "";
+			String key = id+"";
+			String[] split = patients.get(key).split("\t",-1);
+			for(int i=0; i< split.length; i++){
+				patientWith += split[i]+",";
+			}
+			for(String exam:exams){
+				patientWith += predictionsHMM.get(exam).get(key) + ",";
+			}
+			outPredictions.write(patientWith +'\n');
+		}
+		outPredictions.close();
+		CreateData create = new CreateData();
+		create.CSV2arff(path,"PredictionDataWithDemo");
+		//		File a = new File(path + "PredictionDataWithDemo.csv" );
+		//		a.delete();
+		ChangeClassPreditions("PredictionDataWithDemo");
+	}
+
 	private  void buildDataWithPredictionsUnsorted() throws IOException {
 		System.out.println("build Data With Predictions");
 		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
@@ -484,6 +528,48 @@ public class Approach1 {
 			}
 			for(String exam:exams){
 				patientWith += predictions.get(exam).get(key) + ",";
+			}
+			outPredictions.write(patientWith +'\n');
+		}
+		outPredictions.close();
+		CreateData create = new CreateData();
+		create.CSV2arff(path,"PredictionDataWithDemoUnsorted");
+		//		File a = new File(path + "PredictionDataWithDemo.csv" );
+		//		a.delete();
+		ChangeClassPreditions("PredictionDataWithDemoUnsorted");
+	}
+
+	private  void buildDataWithHMMPredictionsUnsorted() throws IOException {
+		System.out.println("build Data With Predictions");
+		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
+		String header = diag.readLine();
+		diag.close();
+		BufferedWriter outPredictions = new BufferedWriter(new FileWriter(path+"PredictionDataWithDemoUnsorted.csv"));
+		outPredictions.write(header+ '\n');
+		String patientWith = "";
+
+		readPatients();
+
+		Set<String> keys = predictionsHMM.get(exams[0]).keySet();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		for(String key: keys){
+			ids.add(Integer.parseInt(key));
+		}
+		//		Collections.sort(ids);
+		//		List<String> ids = new ArrayList<String>();
+		//		ids.addAll(keys);
+		//		Collections.sort(ids);
+		for(Integer id: ids){
+			//			System.out.println(id);
+			patientWith = "";
+			String key = id+"";
+			String[] split = patients.get(key).split("\t",-1);
+			for(int i=0; i< split.length; i++){
+				patientWith += split[i]+",";
+			}
+			for(String exam:exams){
+				patientWith += predictionsHMM.get(exam).get(key) + ",";
 			}
 			outPredictions.write(patientWith +'\n');
 		}
