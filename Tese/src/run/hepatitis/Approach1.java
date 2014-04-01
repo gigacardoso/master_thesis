@@ -52,23 +52,22 @@ public class Approach1 {
 			//a.buildDataWithPredictionsSorted();
 			a.buildDataWithHMMPredictionsSorted();
 			//			a.buildDataWithPredictionsUnsorted();
-			a.buildDataWithHMMPredictionsUnsorted();
-			//			a.ClassifyData(new NaiveBayes(), "");
-			//			a.buildConfussionMatrix("Naive Bayes", "");
+			//			a.buildDataWithHMMPredictionsUnsorted();
+			a.ClassifyData(new NaiveBayes(), "");
+			a.buildConfussionMatrix("Naive Bayes", "");
 			a.ClassifyData(new J48(), "");
 			a.buildConfussionMatrix("J48","");
-			a.ClassifyData(new J48(), "Unsorted");
-			a.buildConfussionMatrix("J48","Unsorted");
+			//			a.ClassifyData(new J48(), "Unsorted");
+			//			a.buildConfussionMatrix("J48","Unsorted");
 			//			a.compareLabeled();
-			//			a.ClassifyData(new AdaBoostM1(), "");
-			//			a.buildConfussionMatrix("AdaBoost","");
+			a.ClassifyData(new AdaBoostM1(), "");
+			a.buildConfussionMatrix("AdaBoost","");
 			//			a.ClassifyData(new MultilayerPerceptron());
 			//			a.buildConfussionMatrix("NN");
-			//			a.ClassifyData(new Logistic(), "");
-			//			a.buildConfussionMatrix("Logistic", "");
-			//			a.ClassifyData(new RandomForest(), "");
-			//			a.buildConfussionMatrix("RandomForest", "");
-			//			a.ClassifyData(new Logistic(), "Unsorted");
+			a.ClassifyData(new Logistic(), "");
+			a.buildConfussionMatrix("Logistic", "");
+			a.ClassifyData(new RandomForest(), "");
+			a.buildConfussionMatrix("RandomForest", "");
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//						a.ClassifyDiagnostic(new NaiveBayes());
@@ -77,12 +76,10 @@ public class Approach1 {
 			//						a.ClassifyDiagnostic(new AdaBoostM1());
 			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
 			//						a.ClassifyDiagnostic(new Logistic());
+			//a.ClassifyDiagnostic(new RandomForest());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
-
 	}
 
 	private void evaluatePredictionsHMM() throws IOException {

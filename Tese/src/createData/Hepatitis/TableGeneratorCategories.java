@@ -43,7 +43,7 @@ public class TableGeneratorCategories {
 			table.examsPut(exams[i], 5+i);
 		}
 		try {
-			int steps = 7;
+			int steps = 3;
 			table.readExams();
 			table.readBiopsy();
 			table.readPatients();
