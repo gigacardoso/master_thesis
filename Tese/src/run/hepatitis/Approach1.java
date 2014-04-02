@@ -45,29 +45,8 @@ public class Approach1 {
 
 	public static void main(String[] args){
 		try {
-			Approach1 a = new Approach1();
-			//			a.predictExams(new J48());
-			//			a.evaluatePredictions();
-			a.evaluatePredictionsHMM();
-			//a.buildDataWithPredictionsSorted();
-			a.buildDataWithHMMPredictionsSorted();
-			//			a.buildDataWithPredictionsUnsorted();
-			//			a.buildDataWithHMMPredictionsUnsorted();
-			a.ClassifyData(new NaiveBayes(), "");
-			a.buildConfussionMatrix("Naive Bayes", "");
-			a.ClassifyData(new J48(), "");
-			a.buildConfussionMatrix("J48","");
-			//			a.ClassifyData(new J48(), "Unsorted");
-			//			a.buildConfussionMatrix("J48","Unsorted");
-			//			a.compareLabeled();
-			a.ClassifyData(new AdaBoostM1(), "");
-			a.buildConfussionMatrix("AdaBoost","");
-			//			a.ClassifyData(new MultilayerPerceptron());
-			//			a.buildConfussionMatrix("NN");
-			a.ClassifyData(new Logistic(), "");
-			a.buildConfussionMatrix("Logistic", "");
-			a.ClassifyData(new RandomForest(), "");
-			a.buildConfussionMatrix("RandomForest", "");
+			hmm();
+			//not_hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//						a.ClassifyDiagnostic(new NaiveBayes());
@@ -80,6 +59,57 @@ public class Approach1 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void hmm() throws IOException, Exception,
+	FileNotFoundException {
+		Approach1 a = new Approach1();
+		//			a.predictExams(new J48());
+		//			a.evaluatePredictions();
+		a.evaluatePredictionsHMM();
+		//a.buildDataWithPredictionsSorted();
+		a.buildDataWithHMMPredictionsSorted();
+		//			a.buildDataWithPredictionsUnsorted();
+		//			a.buildDataWithHMMPredictionsUnsorted();
+		//		a.ClassifyData(new NaiveBayes(), "");
+		//		a.buildConfussionMatrix("Naive Bayes", "");
+		a.ClassifyData(new J48(), "");
+		a.buildConfussionMatrix("J48","");
+		//			a.ClassifyData(new J48(), "Unsorted");
+		//			a.buildConfussionMatrix("J48","Unsorted");
+		//			a.compareLabeled();
+		//		a.ClassifyData(new AdaBoostM1(), "");
+		//		a.buildConfussionMatrix("AdaBoost","");
+		//			a.ClassifyData(new MultilayerPerceptron());
+		//			a.buildConfussionMatrix("NN");
+		//		a.ClassifyData(new Logistic(), "");
+		//		a.buildConfussionMatrix("Logistic", "");
+//		a.ClassifyData(new RandomForest(), "");
+//		a.buildConfussionMatrix("RandomForest", "");
+	}
+
+	private static void not_hmm() throws IOException, Exception,
+	FileNotFoundException {
+		Approach1 a = new Approach1();
+		a.predictExams(new J48());
+		a.evaluatePredictions();
+		a.buildDataWithPredictionsSorted();
+		//			a.buildDataWithPredictionsUnsorted();
+		//		a.ClassifyData(new NaiveBayes(), "");
+		//		a.buildConfussionMatrix("Naive Bayes", "");
+		a.ClassifyData(new J48(), "");
+		a.buildConfussionMatrix("J48","");
+		//			a.ClassifyData(new J48(), "Unsorted");
+		//			a.buildConfussionMatrix("J48","Unsorted");
+		//			a.compareLabeled();
+		//		a.ClassifyData(new AdaBoostM1(), "");
+		//		a.buildConfussionMatrix("AdaBoost","");
+		//			a.ClassifyData(new MultilayerPerceptron());
+		//			a.buildConfussionMatrix("NN");
+		//		a.ClassifyData(new Logistic(), "");
+		//		a.buildConfussionMatrix("Logistic", "");
+		a.ClassifyData(new RandomForest(), "");
+		a.buildConfussionMatrix("RandomForest", "");
 	}
 
 	private void evaluatePredictionsHMM() throws IOException {
@@ -202,7 +232,7 @@ public class Approach1 {
 		double average = 0;
 		DecimalFormat df = new DecimalFormat("#.##");
 		for(String exam:exams){
-			System.out.println(exam);
+			//System.out.println(exam);
 			Integer count = correct.get(exam);
 			double perc = ((double)count)/total *100;
 			average += perc;
@@ -609,10 +639,11 @@ public class Approach1 {
 		try{
 			for(int i= 0; i< exams.length;i++){
 				Instances data = new Instances(new BufferedReader(new FileReader(path+exams[i]/*+"_Multi"*/+".arff")));
+				BufferedWriter out = new BufferedWriter(new FileWriter(hmm+"_________"+exams[i]+"_Predictions.csv"));
 
 				Random rand = new Random(1);   // create seeded number generator
 				Instances randData = new Instances(data);   // create copy of original data
-				randData.randomize(rand); 
+				randData.randomize(rand);
 
 				for (int n = 0; n < folds; n++) {
 					Instances train = randData.trainCV(folds, n);
@@ -645,12 +676,14 @@ public class Approach1 {
 						//						System.out.println("\t-> "+d);
 						String in = (ins.toString().split(","))[0];
 						exam.put(in , indexes.get(exams[i]).get(d));
+						out.write(in+ ","+indexes.get(exams[i]).get(d)+ "\n");
 					}
 					System.out.println("saving "+ exams[i] + " exams \t" + exam);
 					predictions.put(exams[i], exam);
 					//					System.out.println("Sleeping - ZzZZZZZZzzZZZZ");
 					//					Thread.sleep(1000);
 				}
+				out.close();
 			}
 
 		}

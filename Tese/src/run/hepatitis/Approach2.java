@@ -17,6 +17,8 @@ import utils.DefaultHashMap;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.Logistic;
+import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
@@ -31,7 +33,7 @@ public class Approach2 {
 	private String andreia = data + "andreia\\";
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 7;
+	private  int steps = 12;
 	private  int folds = 10;
 
 	public static void main(String[] args){
@@ -43,22 +45,22 @@ public class Approach2 {
 			//			a.buildDataWithPredictionsUnsorted();
 			a.ClassifyData(new NaiveBayes(), "");
 			a.buildConfussionMatrix("Naive Bayes", "");
-			a.ClassifyData(new RandomForest(), "");
-			a.buildConfussionMatrix("RandomForest", "");
 			//			J48 j48 = new J48();
 			//			j48.setMinNumObj(50);
-//			a.ClassifyData(new J48(), "");
-//			a.buildConfussionMatrix("J48","");
+			a.ClassifyData(new J48(), "");
+			a.buildConfussionMatrix("J48","");
 			//			a.ClassifyData(j48, "Unsorted");
 			//			a.buildConfussionMatrix("J48","Unsorted");
 			//			a.compareLabeled();
-//			a.ClassifyData(new AdaBoostM1(), "");
-//			a.buildConfussionMatrix("AdaBoost","");
+			a.ClassifyData(new AdaBoostM1(), "");
+			a.buildConfussionMatrix("AdaBoost","");
 			//			a.ClassifyData(new MultilayerPerceptron());
 			//			a.buildConfussionMatrix("NN");
-//			a.ClassifyData(new Logistic(), "");
-//			a.buildConfussionMatrix("Logistic", "");
+			a.ClassifyData(new Logistic(), "");
+			a.buildConfussionMatrix("Logistic", "");
 			//			a.ClassifyData(new Logistic(), "Unsorted");
+			a.ClassifyData(new RandomForest(), "");
+			a.buildConfussionMatrix("RandomForest", "");
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//			a.ClassifyDiagnostic(new NaiveBayes());

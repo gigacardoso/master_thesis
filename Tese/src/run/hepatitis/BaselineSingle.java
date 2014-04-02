@@ -15,7 +15,7 @@ public class BaselineSingle {
 	private static String data = "C:\\hepat_data030704\\";
 	private static String path = data +"data\\";
 	private final static int folds = 10;
-	private final static int steps = 7;
+	private final static int steps = 12;
 
 	public static void main(String[] args) {
 		BaselineSingle b = new BaselineSingle();
