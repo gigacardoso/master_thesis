@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class MissingRemover {
+public class UniHMMMissingRemover {
 
 	private static String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};	
 	private static String data = "C:\\hepat_data030704\\";
