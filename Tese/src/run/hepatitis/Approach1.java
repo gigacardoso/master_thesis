@@ -40,7 +40,7 @@ public class Approach1 {
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 7;
+	private  int steps = 12;
 	private  int folds = 10;
 
 	public static void main(String[] args){
@@ -71,21 +71,21 @@ public class Approach1 {
 		a.buildDataWithHMMPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
 		//			a.buildDataWithHMMPredictionsUnsorted();
-		//		a.ClassifyData(new NaiveBayes(), "");
-		//		a.buildConfussionMatrix("Naive Bayes", "");
+		a.ClassifyData(new NaiveBayes(), "");
+		a.buildConfussionMatrix("Naive Bayes", "");
 		a.ClassifyData(new J48(), "");
 		a.buildConfussionMatrix("J48","");
 		//			a.ClassifyData(new J48(), "Unsorted");
 		//			a.buildConfussionMatrix("J48","Unsorted");
 		//			a.compareLabeled();
-		//		a.ClassifyData(new AdaBoostM1(), "");
-		//		a.buildConfussionMatrix("AdaBoost","");
+		a.ClassifyData(new AdaBoostM1(), "");
+		a.buildConfussionMatrix("AdaBoost","");
 		//			a.ClassifyData(new MultilayerPerceptron());
 		//			a.buildConfussionMatrix("NN");
-		//		a.ClassifyData(new Logistic(), "");
-		//		a.buildConfussionMatrix("Logistic", "");
-//		a.ClassifyData(new RandomForest(), "");
-//		a.buildConfussionMatrix("RandomForest", "");
+		a.ClassifyData(new Logistic(), "");
+		a.buildConfussionMatrix("Logistic", "");
+		a.ClassifyData(new RandomForest(), "");
+		a.buildConfussionMatrix("RandomForest", "");
 	}
 
 	private static void not_hmm() throws IOException, Exception,
