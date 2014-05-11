@@ -31,7 +31,7 @@ public class TableGeneratorCategories {
 	private DefaultHashMap<String, String> biopsys = new DefaultHashMap<String, String>("");
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private DefaultHashMap<String, String> headers = new DefaultHashMap<String, String>("");
-	public static int steps = 12;
+	public static int steps = 3;
 
 	private void examsPut(String s, int i){
 		examsIndexes.put(s, i);
@@ -55,7 +55,7 @@ public class TableGeneratorCategories {
 			table.createBaselineSingleOb(steps);
 			table.createBaselineMultipleOb(steps);
 			table.convertToArff();
-			//table.convertToMultiInstanceArff();
+			table.convertToMultiInstanceArff();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

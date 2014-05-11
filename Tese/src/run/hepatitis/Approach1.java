@@ -40,7 +40,7 @@ public class Approach1 {
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 12;
+	private  int steps = 3;
 	private  int folds = 10;
 
 	public static void main(String[] args){

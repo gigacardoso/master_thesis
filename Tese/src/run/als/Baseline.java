@@ -17,7 +17,7 @@ public class Baseline {
 			File.separator + "FormatedData"+ File.separator + "Baseline" + File.separator;
 	private static String pathNoClass = path + "NoClass" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = 3;
+	private final static int steps = 6;
 
 	public static void main(String[] args) {
 		Baseline b = new Baseline();

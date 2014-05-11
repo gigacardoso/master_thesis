@@ -17,7 +17,7 @@ public class AlternativeApproach {
 	private static String path = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" +
 			File.separator + "FormatedData"+ File.separator + "AlternativeApproach" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = 3;
+	private final static int steps = 6;
 
 	public static void main(String[] args) {
 		AlternativeApproach aa = new AlternativeApproach();
