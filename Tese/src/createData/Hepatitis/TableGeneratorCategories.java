@@ -55,7 +55,7 @@ public class TableGeneratorCategories {
 			table.createBaselineSingleOb(steps);
 			table.createBaselineMultipleOb(steps);
 			table.convertToArff();
-			table.convertToMultiInstanceArff();
+			//table.convertToMultiInstanceArff();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -72,7 +72,7 @@ public class TableGeneratorCategories {
 		HashMap<Integer,BufferedWriter> writers = new HashMap<Integer,BufferedWriter>();
 		String line = inFact.readLine();
 		String[] splited = line.split(",");
-		for(int i= 0; i< exams.length-1; i++){
+		for(int i= 0; i< exams.length; i++){
 			BufferedWriter table = new BufferedWriter(new FileWriter(out + exams[i]+"_2.csv"));
 			String entry = splited[0]+",";
 			for(int j= 0 ; j<steps-1; j++){
@@ -122,7 +122,7 @@ public class TableGeneratorCategories {
 				}
 			}
 		}
-		for(int i= 0; i< exams.length-1; i++){
+		for(int i= 0; i< exams.length; i++){
 			writers.get(i).close();
 		}
 		inFact.close();

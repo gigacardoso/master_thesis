@@ -31,20 +31,24 @@ import createData.ALS.CreateData;
 public class Approach2 {
 	private String data = "C:\\hepat_data030704\\";
 	private String path = data +"data\\";
+	private String times = path + "times\\";
 	private String andreia = data + "andreia\\";
 	private String hmm = path + "predictionsHMM_Multi\\";
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
+	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
 	private  int steps = 12;
 	private  int folds = 10;
-
+	
+	long[] examsTime = new long[exams.length];
+	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 		try {
-			hmm();
-			//not_hmm();
+			//hmm();
+			not_hmm();
 			
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//			a.ClassifyDiagnostic(new NaiveBayes());
@@ -59,8 +63,7 @@ public class Approach2 {
 		}
 	}
 
-	private static void hmm() throws IOException, Exception,
-	FileNotFoundException {
+	private static void hmm() throws IOException, Exception,FileNotFoundException {
 		Approach2 a = new Approach2();
 		a.evaluatePredictionsHMM();
 		a.buildDataWithHMMPredictionsSorted();
@@ -80,28 +83,58 @@ public class Approach2 {
 	private static void not_hmm() throws IOException, Exception,
 	FileNotFoundException {
 		Approach2 a = new Approach2();
-		a.predictExams(new J48());
-		a.evaluatePredictions();
+		start = System.currentTimeMillis();
+		J48 j = new J48();
+		a.predictExams(j);
+		predictionsTime = System.currentTimeMillis();
+		//a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
+		startClassification = System.currentTimeMillis();
 		a.ClassifyData(new NaiveBayes(), "");
-		a.buildConfussionMatrix("Naive Bayes", "");
-		//			J48 j48 = new J48();
-		//			j48.setMinNumObj(50);
+		endNaive = System.currentTimeMillis();
+		//a.buildConfussionMatrix("Naive Bayes", "");
+		a.ClassifyData(new RandomForest(), "");
+		endRF = System.currentTimeMillis();
+		//a.buildConfussionMatrix("RandomForest", "");
 		a.ClassifyData(new J48(), "");
-		a.buildConfussionMatrix("J48","");
-		//			a.ClassifyData(j48, "Unsorted");
+		endDT = System.currentTimeMillis();
+		//a.buildConfussionMatrix("J48","");
+		//			a.ClassifyData(new J48(), "Unsorted");
 		//			a.buildConfussionMatrix("J48","Unsorted");
 		//			a.compareLabeled();
 		a.ClassifyData(new AdaBoostM1(), "");
-		a.buildConfussionMatrix("AdaBoost","");
+		endAdaboost = System.currentTimeMillis();
+		//		a.buildConfussionMatrix("AdaBoost","");
 		//			a.ClassifyData(new MultilayerPerceptron());
 		//			a.buildConfussionMatrix("NN");
 		a.ClassifyData(new Logistic(), "");
-		a.buildConfussionMatrix("Logistic", "");
-		//			a.ClassifyData(new Logistic(), "Unsorted");
-		a.ClassifyData(new RandomForest(), "");
-		a.buildConfussionMatrix("RandomForest", "");
+		endLogistic = System.currentTimeMillis();
+		//		a.buildConfussionMatrix("Logistic", "");
+		a.writeTimes(j);
+	}
+	
+	private void writeTimes(Classifier j) throws IOException {
+		String c = j.getClass().toString();
+		String[] spl = c.split("\\.");
+		c = spl[(spl.length-1)];
+		BufferedWriter out = new BufferedWriter(new FileWriter(times+"AP2_HepatiteTimes_"+steps+"_"+c+".csv"));
+		out.write("Overall Time"+"\n");
+		out.write((predictionsTime-start) + "\n\n");
+		int i = 0;
+		long prevL = start;
+		for(long l:examsTime){
+			out.write(exams[i]+";"+(l-prevL)+"\n");
+			prevL = l;
+			i++;
+		}
+		out.write("\nClassifications\n\n");
+		out.write("Naive"+";" + (endNaive - startClassification) + "\n");
+		out.write("RandomForest"+";" + (endRF - endNaive) + "\n");
+		out.write("DT"+";" + (endDT - endRF) + "\n");
+		out.write("AdaBoost"+";" + (endAdaboost - endDT) + "\n");
+		out.write("Logistics"+";" + (endLogistic - endAdaboost) + "\n");
+		out.close();
 	}
 
 	private void evaluatePredictionsHMM() throws IOException {
@@ -622,6 +655,7 @@ public class Approach2 {
 					}
 					predictions.put(exams[i], exam);
 				}
+				examsTime[i] = System.currentTimeMillis();
 			}
 
 		}

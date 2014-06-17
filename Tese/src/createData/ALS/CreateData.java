@@ -27,7 +27,7 @@ public class CreateData {
 	public static void main(String[] args) {
 		CreateData create = new CreateData();
 		try {
-			steps = 5;
+			steps = 6;
 			create.diagnosticData();
 			create.diagnosticData2();
 			

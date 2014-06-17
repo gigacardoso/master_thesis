@@ -30,6 +30,7 @@ import createData.ALS.CreateData;
 public class Approach1 {
 	private String data = "C:\\hepat_data030704\\";
 	private String path = data +"data\\";
+	private String times = path + "times\\";
 	private String andreia = data + "andreia\\";
 	private String hmm = path + "predictionsHMM\\";
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
@@ -43,10 +44,12 @@ public class Approach1 {
 	private  int steps = 12;
 	private  int folds = 10;
 
+	long[] examsTime = new long[exams.length];
+	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 		try {
-			hmm();
-			//not_hmm();
+			//hmm();
+			not_hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//						a.ClassifyDiagnostic(new NaiveBayes());
@@ -91,25 +94,58 @@ public class Approach1 {
 	private static void not_hmm() throws IOException, Exception,
 	FileNotFoundException {
 		Approach1 a = new Approach1();
-		a.predictExams(new J48());
-		a.evaluatePredictions();
+		start = System.currentTimeMillis();
+		J48 j = new J48();
+		a.predictExams(j);
+		predictionsTime = System.currentTimeMillis();
+		//a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
-		//		a.ClassifyData(new NaiveBayes(), "");
-		//		a.buildConfussionMatrix("Naive Bayes", "");
+		startClassification = System.currentTimeMillis();
+		a.ClassifyData(new NaiveBayes(), "");
+		endNaive = System.currentTimeMillis();
+		//a.buildConfussionMatrix("Naive Bayes", "");
+		a.ClassifyData(new RandomForest(), "");
+		endRF = System.currentTimeMillis();
+		//a.buildConfussionMatrix("RandomForest", "");
 		a.ClassifyData(new J48(), "");
-		a.buildConfussionMatrix("J48","");
+		endDT = System.currentTimeMillis();
+		//a.buildConfussionMatrix("J48","");
 		//			a.ClassifyData(new J48(), "Unsorted");
 		//			a.buildConfussionMatrix("J48","Unsorted");
 		//			a.compareLabeled();
-		//		a.ClassifyData(new AdaBoostM1(), "");
+		a.ClassifyData(new AdaBoostM1(), "");
+		endAdaboost = System.currentTimeMillis();
 		//		a.buildConfussionMatrix("AdaBoost","");
 		//			a.ClassifyData(new MultilayerPerceptron());
 		//			a.buildConfussionMatrix("NN");
-		//		a.ClassifyData(new Logistic(), "");
+		a.ClassifyData(new Logistic(), "");
+		endLogistic = System.currentTimeMillis();
 		//		a.buildConfussionMatrix("Logistic", "");
-		a.ClassifyData(new RandomForest(), "");
-		a.buildConfussionMatrix("RandomForest", "");
+		a.writeTimes(j);
+	}
+
+	private void writeTimes(Classifier j) throws IOException {
+		String c = j.getClass().toString();
+		String[] spl = c.split("\\.");
+		c = spl[(spl.length-1)];
+		BufferedWriter out = new BufferedWriter(new FileWriter(times+"AP1_HepatiteTimes_"+steps+"_"+c+".csv"));
+		out.write("Overall Time"+"\n");
+		out.write((predictionsTime-start) + "\n\n");
+		int i = 0;
+		long prevL = start;
+		for(long l:examsTime){
+			out.write(exams[i]+";"+(l-prevL)+"\n");
+			prevL = l;
+			i++;
+		}
+		out.write("\nClassifications\n\n");
+		out.write("Naive"+";" + (endNaive - startClassification) + "\n");
+		out.write("RandomForest"+";" + (endRF - endNaive) + "\n");
+		out.write("DT"+";" + (endDT - endRF) + "\n");
+		out.write("AdaBoost"+";" + (endAdaboost - endDT) + "\n");
+		out.write("Logistics"+";" + (endLogistic - endAdaboost) + "\n");
+		out.close();
 	}
 
 	private void evaluatePredictionsHMM() throws IOException {
@@ -678,11 +714,13 @@ public class Approach1 {
 						exam.put(in , indexes.get(exams[i]).get(d));
 						out.write(in+ ","+indexes.get(exams[i]).get(d)+ "\n");
 					}
-					System.out.println("saving "+ exams[i] + " exams \t" + exam);
+					//System.out.println("saving "+ exams[i] + " exams \t" + exam);
 					predictions.put(exams[i], exam);
 					//					System.out.println("Sleeping - ZzZZZZZZzzZZZZ");
 					//					Thread.sleep(1000);
+					
 				}
+				examsTime[i] = System.currentTimeMillis();
 				out.close();
 			}
 
