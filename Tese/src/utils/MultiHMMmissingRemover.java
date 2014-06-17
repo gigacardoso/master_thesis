@@ -19,7 +19,7 @@ public class MultiHMMmissingRemover {
 	private static String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};	
 	private static String data = "C:\\hepat_data030704\\";
 	private static String path = data +"data\\";
-	private static String outPath = "C:\\Users\\Daniel\\Documents\\GitHub\\HMMinR\\multidata\\";
+	private static String outPath = "C:\\Users\\Daniel\\Documents\\GitHub\\HMMinR\\multidata\\noSymb\\";
 	private static HashMap<String,Boolean> keep = new HashMap<String, Boolean>();
 
 
@@ -95,7 +95,7 @@ public class MultiHMMmissingRemover {
 						line = a.get(id).split(",",-1)[0] + ","; 
 						header = "PatientID,";
 					}
-					line += a.get(id).split(",",-1)[j] + "_"+ exams[i]+ ",";
+					line += a.get(id).split(",",-1)[j] + "," ; //+ "_"+ exams[i]+ ",";
 					header += exams[i]+"_"+(j-1)+ "," ;
 				}
 			}
@@ -134,7 +134,7 @@ public class MultiHMMmissingRemover {
 				String id = s.split(",",-1)[0];
 				if(keep.get(id) != null){
 					String output = multi.get(id);
-					output += s.split(",",-1)[(steps-1)] + "_"+ exams[i];
+					output += s.split(",",-1)[(steps-1)]; //+ "_"+ exams[i];
 					out.write(output + "\n");
 				}
 			}			

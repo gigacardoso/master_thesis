@@ -16,7 +16,9 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.Logistic;
+import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.meta.FilteredClassifier;
+import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -30,32 +32,48 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 6;
+	private  int steps = 5;
 	private  int folds = 10;
 
+	long[] vitalsTime = new long[6];
+	long[] svcTime = new long[4];
+	static long start,vitals,SVC,predictions,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 
 		try {
 			Approach1 a = new Approach1();
+			start = System.currentTimeMillis();
+			//System.out.println("start: " + start);
+
+			vitals = System.currentTimeMillis();
 			a.predictVitals();
+			SVC = System.currentTimeMillis();
 			a.predictSVC();
+			predictions = System.currentTimeMillis();
 			a.buildDataWithPredictions();
 			a.evaluatePredictions();
-						a.ClassifyData(new NaiveBayes());
-						a.buildConfussionMatrix("Naive Bayes");
-						a.ClassifyData(new RandomForest());
-						a.buildConfussionMatrix("RandomForest");
-//						a.ClassifyData(new J48());
-//						a.buildConfussionMatrix("J48");
-//						a.ClassifyData(new AdaBoostM1());
-//						a.buildConfussionMatrix("AdaBoost");
+			startClassification = System.currentTimeMillis();
+			a.ClassifyData(new NaiveBayes());
+			endNaive = System.currentTimeMillis();
+			//a.buildConfussionMatrix("Naive Bayes");
+			a.ClassifyData(new RandomForest());
+			endRF = System.currentTimeMillis();
+			//a.buildConfussionMatrix("RandomForest");
+			a.ClassifyData(new J48());
+			endDT = System.currentTimeMillis();
+			//						a.buildConfussionMatrix("J48");
+			a.ClassifyData(new AdaBoostM1());
+			endAdaboost = System.currentTimeMillis();
+			//						a.buildConfussionMatrix("AdaBoost");
 			//			a.ClassifyData(new MultilayerPerceptron());
 			//			a.buildConfussionMatrix("NN");
-//						a.ClassifyData(new Logistic());
-//						a.buildConfussionMatrix("Logistic");
-
+			a.ClassifyData(new Logistic());
+			endLogistic = System.currentTimeMillis();
+			//						a.buildConfussionMatrix("Logistic");
+			
+			a.writeTimes();
 			System.out.println("------------------\tDiagnostic\t------------------");
-//						a.ClassifyDiagnostic(new NaiveBayes());
+			//						a.ClassifyDiagnostic(new NaiveBayes());
 			//			a.ClassifyDiagnostic(new J48());
 			//			a.ClassifyDiagnostic(new AdaBoostM1());
 			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
@@ -64,6 +82,36 @@ public class Approach1 {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void writeTimes() throws IOException {
+		BufferedWriter out = new BufferedWriter(new FileWriter(path+"AP1_ALStimes_"+steps+".csv"));
+		int[] vitalsIndex = {2,3,6,7,8,9};
+		int[] svcIndex = {2,5,6,7};
+		
+		out.write("Overall Time"+"\n");
+		out.write((predictions-start) + "\n\n");
+		int i = 0;
+		long prevL = vitals;
+		for(long l:vitalsTime){
+			out.write("vitals"+vitalsIndex[i]+";"+(l-prevL)+"\n");
+			prevL = l;
+			i++;
+		}
+		i = 0;
+		prevL = SVC;
+		for(long l:svcTime){
+			out.write("svc"+svcIndex[i]+";"+(l-prevL)+"\n");
+			prevL = l;
+			i++;
+		}
+		out.write("\nClassifications\n\n");
+		out.write("Naive"+";" + (endNaive - startClassification) + "\n");
+		out.write("RandomForest"+";" + (endRF - endNaive) + "\n");
+		out.write("DT"+";" + (endDT - endRF) + "\n");
+		out.write("AdaBoost"+";" + (endAdaboost - endDT) + "\n");
+		out.write("Logistics"+";" + (endLogistic - endAdaboost) + "\n");
+		out.close();
 	}
 
 	private void evaluatePredictions() throws FileNotFoundException, IOException {
@@ -399,6 +447,7 @@ public class Approach1 {
 	private  void predictVitals() {
 		int[] vitalsIndex = {2,3,6,7,8,9};
 		try{
+			int o = 0;
 			for(int index:vitalsIndex){
 				CSVLoader loader = new CSVLoader();
 				loader.setSource(new File(path+"approach1_Vitals"+index+"_"+steps+".csv"));
@@ -443,6 +492,8 @@ public class Approach1 {
 					}
 					vitalsAll.put(index, vitals);
 				}
+				vitalsTime[o] = System.currentTimeMillis();
+				o++;
 			}
 
 		}
@@ -454,6 +505,7 @@ public class Approach1 {
 	private  void predictSVC() {
 		int[] svcIndex = {2,5,6,7};
 		try{
+			int o = 0;
 			for(int index:svcIndex){
 				CSVLoader svcLoader = new CSVLoader();
 				svcLoader.setSource(new File(path+"approach1_SVC"+index+"_"+steps+".csv"));
@@ -498,6 +550,8 @@ public class Approach1 {
 					}
 					svcAll.put(index, svc);
 				}
+				svcTime[o] = System.currentTimeMillis();
+				o++;
 			}
 
 			// Get the confusion matrix
