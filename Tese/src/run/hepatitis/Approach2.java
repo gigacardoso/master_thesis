@@ -40,16 +40,16 @@ public class Approach2 {
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 12;
+	private  int steps = 3;
 	private  int folds = 10;
-	
+
 	long[] examsTime = new long[exams.length];
 	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 		try {
 			//hmm();
 			not_hmm();
-			
+
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//			a.ClassifyDiagnostic(new NaiveBayes());
 			//			j48 = new J48();
@@ -84,36 +84,36 @@ public class Approach2 {
 	FileNotFoundException {
 		Approach2 a = new Approach2();
 		start = System.currentTimeMillis();
-		J48 j = new J48();
+		Logistic j = new Logistic();
 		a.predictExams(j);
 		predictionsTime = System.currentTimeMillis();
 		//a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
 		startClassification = System.currentTimeMillis();
-		a.ClassifyData(new NaiveBayes(), "");
+		//a.ClassifyData(new NaiveBayes(), "");
 		endNaive = System.currentTimeMillis();
 		//a.buildConfussionMatrix("Naive Bayes", "");
 		a.ClassifyData(new RandomForest(), "");
 		endRF = System.currentTimeMillis();
-		//a.buildConfussionMatrix("RandomForest", "");
-		a.ClassifyData(new J48(), "");
+		a.buildConfussionMatrix("RandomForest", "");
+		//a.ClassifyData(new J48(), "");
 		endDT = System.currentTimeMillis();
 		//a.buildConfussionMatrix("J48","");
 		//			a.ClassifyData(new J48(), "Unsorted");
 		//			a.buildConfussionMatrix("J48","Unsorted");
 		//			a.compareLabeled();
-		a.ClassifyData(new AdaBoostM1(), "");
+		//a.ClassifyData(new AdaBoostM1(), "");
 		endAdaboost = System.currentTimeMillis();
-		//		a.buildConfussionMatrix("AdaBoost","");
+		//a.buildConfussionMatrix("AdaBoost","");
 		//			a.ClassifyData(new MultilayerPerceptron());
 		//			a.buildConfussionMatrix("NN");
-		a.ClassifyData(new Logistic(), "");
+		//a.ClassifyData(new Logistic(), "");
 		endLogistic = System.currentTimeMillis();
-		//		a.buildConfussionMatrix("Logistic", "");
-		a.writeTimes(j);
+		//a.buildConfussionMatrix("Logistic", "");
+		//a.writeTimes(j);
 	}
-	
+
 	private void writeTimes(Classifier j) throws IOException {
 		String c = j.getClass().toString();
 		String[] spl = c.split("\\.");
@@ -501,7 +501,7 @@ public class Approach2 {
 		//		a.delete();
 		ChangeClassPreditions("PredictionDataWithDemo");
 	}
-	
+
 	private  void buildDataWithHMMPredictionsSorted() throws IOException {
 		System.out.println("build Data With Predictions");
 		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};

@@ -32,7 +32,7 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 6;
+	private  int steps = 5;
 	private  int folds = 10;
 
 	long[] vitalsTime = new long[6];
@@ -46,9 +46,9 @@ public class Approach1 {
 			//System.out.println("start: " + start);
 
 			vitals = System.currentTimeMillis();
-			a.predictVitals();
+			a.predictVitals(new LinearRegression());
 			SVC = System.currentTimeMillis();
-			a.predictSVC();
+			a.predictSVC(new LinearRegression());
 			predictions = System.currentTimeMillis();
 			a.buildDataWithPredictions();
 			a.evaluatePredictions();
@@ -444,7 +444,7 @@ public class Approach1 {
 		inVitals.close();
 	}
 
-	private  void predictVitals() {
+	private  void predictVitals(Classifier c) {
 		int[] vitalsIndex = {2,3,6,7,8,9};
 		try{
 			int o = 0;
@@ -467,7 +467,7 @@ public class Approach1 {
 					test.setClassIndex(test.numAttributes() - 1);
 
 					// Create Classifier
-					Classifier cModel = (Classifier) new LinearRegression();   
+					Classifier cModel = (Classifier) c;   
 					cModel.buildClassifier(train);
 
 					// Test the model
@@ -502,7 +502,7 @@ public class Approach1 {
 		}
 	}
 
-	private  void predictSVC() {
+	private  void predictSVC(Classifier c) {
 		int[] svcIndex = {2,5,6,7};
 		try{
 			int o = 0;
@@ -525,7 +525,7 @@ public class Approach1 {
 					test.setClassIndex(test.numAttributes() - 1);
 
 					// Create Classifier
-					Classifier cModel = (Classifier) new LinearRegression();   
+					Classifier cModel = (Classifier) c;   
 					cModel.buildClassifier(train);
 
 					// Test the model

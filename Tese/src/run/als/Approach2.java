@@ -33,7 +33,7 @@ public class Approach2 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 6;
+	private  int steps = 5;
 	private  int folds = 10;
 
 	long[] vitalsTime = new long[6];
