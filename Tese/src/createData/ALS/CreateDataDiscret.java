@@ -15,7 +15,7 @@ import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 
-public class CreateData {
+public class CreateDataDiscret {
 
 	public  String path = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "ToUse"+ File.separator;
 	public static  String alternativeOutput = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "AlternativeData"+ File.separator;
@@ -24,28 +24,34 @@ public class CreateData {
 	private  HashMap<Integer,Boolean> _common = new HashMap<Integer, Boolean>();
 	public static  int steps;
 
+	Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
+			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
+	Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,(float) 40,
+			(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
+
 	public static void main(String[] args) {
-		CreateData create = new CreateData();
+		CreateDataDiscret create = new CreateDataDiscret();
 		try {
 			steps = 5;
 			create.diagnosticData();
-			create.diagnosticData2();
-//			
-//			create.alternativeApproach(steps);
-//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-//			aa.createData(steps);
-//			aa.createDataNoClass(steps);
-//			create.approach1(steps);
-//			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
-//			a1.createDataSVC(steps);
-//			a1.createDataVitals(steps);
-//			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
-//			a2.createData(steps);
-//			create.baseLineWithClass();
-//			create.baseLineWithoutClass();
-//			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
-//			move.MoveAllData(steps);
+			//create.diagnosticData2();
+			//			
+			//			create.alternativeApproach(steps);
+			//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
+			//			aa.createData(steps);
+			//			aa.createDataNoClass(steps);
+			//			create.approach1(steps);
+			//			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
+			//			a1.createDataSVC(steps);
+			//			a1.createDataVitals(steps);
+			//			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
+			//			a2.createData(steps);
+			//			create.baseLineWithoutClass();
+			//			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
+			//			move.MoveAllData(steps);
 			//create.CleanData();
+
+			//			create.baseLineWithClass();
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -64,24 +70,24 @@ public class CreateData {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public  void DeleteFiles(String folder) throws IOException {
-        System.out.println("Called deleteFiles");
-        File file = new File(folder);
+		System.out.println("Called deleteFiles");
+		File file = new File(folder);
 
-        String[] myFiles;
-        if (file.isDirectory()) {
-            myFiles = file.list();
-            for (int i = 0; i < myFiles.length; i++) {
-                File myFile = new File(file, myFiles[i]);
-                System.out.println(myFile);
-               if (!myFile.isDirectory()) {
-                    myFile.delete();
-                }
-            }
-        }
+		String[] myFiles;
+		if (file.isDirectory()) {
+			myFiles = file.list();
+			for (int i = 0; i < myFiles.length; i++) {
+				File myFile = new File(file, myFiles[i]);
+				System.out.println(myFile);
+				if (!myFile.isDirectory()) {
+					myFile.delete();
+				}
+			}
+		}
 
-    }
+	}
 
 	public  void CSV2arff(String path,String str){ 
 		// load CSV
@@ -114,9 +120,9 @@ public class CreateData {
 		remove("Vitals_Data.csv", steps+"_Vitals_DATA.csv",approach1Output, steps);
 
 	}
-	
+
 	// creates diagnosis data only with patients that have the required (steps) time points
-	// diagnosis data only has steps-1 timepoins
+	// diagnosis data only has steps-1 time points
 	// diagnosis real has the last time point
 	private  void diagnosticData() throws IOException {
 		System.out.println("Diagnostic data");
@@ -203,34 +209,37 @@ public class CreateData {
 													patient = last+ ",";
 													patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
 
+													//TODO
 													for(int i=0 ; i < steps-1; i++){
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
+														patient += split4[4] + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-														patient += split[2] + "," + split[5] + "," + split[6] + "," + split[7]+",";
+														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6]) + "," + discretize(6,split[7])+",";
 														split3 = lines3.get(((lines3.size()-steps)+i)).split(",",-1);
-														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
-																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
+														patient += discretize(7,split3[2]) + "," + discretize(8,split3[3]) + "," + discretize(9,split3[6]) + ","
+																+ discretize(10,split3[7]) + "," + discretize(11,split3[8]) + "," + discretize(12,split3[9]) + ",";
 														split2 = lines2.get(((lines2.size()-steps)+i)).split(",",-1);
-														String discret = discretize(split2[15]);
+														String discret = discretize(13,split2[15]);
 														patient += discret;
 
 														outTrain.write(patient+'\n');
 													}
 
 													patient = last+ ",";
-													patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
+													patient += split4[4] + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 
 													split = line1.split(",",-1);
-													patient += split[2].replace(' ', '_').replace('%', 'P') + "," + split[5].replace(' ', '_')+ "," +
-															split[6].replace(' ', '_') + "," + split[7].replace(' ', '_')+ ",";
+													patient += discretize(3,split[2].replace(' ', '_').replace('%', 'P')) + "," + discretize(4,split[5].replace(' ', '_'))+ "," +
+															discretize(5,split[6].replace(' ', '_')) + "," + discretize(6,split[7].replace(' ', '_'))+ ",";
 													split3 = line3.split(",",-1);
-													patient += split3[2].replace(' ', '_') + "," + split3[3].replace(' ', '_')+ "," + split3[6].replace(' ', '_')+ ","
-															+ split3[7].replace(' ', '_')+ "," + split3[8].replace(' ', '_')  + "," + split3[9].replace(' ', '_') + ",";
+													patient += discretize(7,split3[2].replace(' ', '_')) + "," + discretize(8,split3[3].replace(' ', '_'))+ "," +
+															discretize(9,split3[6].replace(' ', '_'))+ ","
+															+ discretize(10,split3[7].replace(' ', '_'))+ "," + discretize(11,split3[8].replace(' ', '_'))  + "," +
+															discretize(12,split3[9].replace(' ', '_')) + ",";
 													split2 = lines2.get((lines2.size()-1)).split(",",-1);
-													String discret = discretize(split2[15]);
+													String discret = discretize(13,split2[15]);
 													patient +=  discret;
 													outReal.write(patient+'\n');
 
@@ -274,13 +283,13 @@ public class CreateData {
 		CSV2arff(diagnosisOutput,"DiagnoseData");
 		CSV2arff(diagnosisOutput,"DiagnoseDataReal");
 	}
-	
+
 	// creates diagnosis data with everything (more or less steps and all timepoints)
 	private  void diagnosticData2() throws IOException {
 		System.out.println("Diagnostic data2");
-//		remove("ALSFRS_Data.csv", steps+"_ALSFRS_DATA.csv",path, steps);
-//		remove("SVC_Data.csv", steps+"_SVC_DATA.csv",path, steps);
-//		remove("Vitals_Data.csv", steps+"_Vitals_DATA.csv",path, steps);
+		//		remove("ALSFRS_Data.csv", steps+"_ALSFRS_DATA.csv",path, steps);
+		//		remove("SVC_Data.csv", steps+"_SVC_DATA.csv",path, steps);
+		//		remove("Vitals_Data.csv", steps+"_Vitals_DATA.csv",path, steps);
 
 		String alsfrs = path+ "ALSFRS_Data.csv";
 		String svc = path + "SVC_Data.csv";
@@ -370,7 +379,7 @@ public class CreateData {
 														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
 																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
 														split2 = lines2.get(((lines2.size()-len)+i)).split(",",-1);
-														String discret = discretize(split2[15]);
+														String discret = discretize(13,split2[15]);
 														patient += discret;
 
 														outTrain.write(patient+'\n');
@@ -413,7 +422,7 @@ public class CreateData {
 
 		CSV2arff(diagnosisOutput,"DiagnoseData");
 	}
-	
+
 
 	private  void baseLineWithClass() throws IOException {
 		System.out.println("Baseline With Class");
@@ -516,10 +525,10 @@ public class CreateData {
 														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
 																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
 														split2 = lines2.get((lines2.size()-steps)+i).split(",",-1);
-														String discret = discretize(split2[15]);
+														String discret = discretize(13,split2[15]);
 														patient +=  discret + ",";
 														split2 = lines2.get((lines2.size()-1)).split(",",-1);
-														discret = discretize(split2[15]);
+														discret = discretize(13,split2[15]);
 														patient +=  discret;
 
 														out[i].write(patient+'\n');
@@ -570,7 +579,7 @@ public class CreateData {
 
 	private  void baseLineWithoutClass() throws IOException {
 		System.out.println("Baseline Without Class");
-		
+
 		remove("ALSFRS_Data.csv", steps+"_ALSFRS_DATA.csv",path, steps);
 		remove("SVC_Data.csv", steps+"_SVC_DATA.csv",path, steps);
 		remove("Vitals_Data.csv", steps+"_Vitals_DATA.csv",path, steps);
@@ -669,7 +678,7 @@ public class CreateData {
 														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
 																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
 														split2 = lines2.get((lines2.size()-1)).split(",",-1);
-														String discret = discretize(split2[15]);
+														String discret = discretize(13,split2[15]);
 														patient +=  discret;
 
 														out[i].write(patient+'\n');
@@ -718,24 +727,38 @@ public class CreateData {
 		}
 	}	
 
-	private  String discretize(String string) {
-		int i;
-		try{
-			i = Integer.parseInt(string);
-		}catch(Exception e) {
-			return "";
-		}
-		if(i<=10){
-			return "{0-12}";
-		}else {
-			if(i<=20){
-				return "{12-24}";
-			}else{
-				if(i<30){
-					return "{24-36}";
-				}else {
-					return "{36-48}";
+	private  String discretize(int var ,String string) {
+		var--;
+		if(var ==12){ 
+			int i;
+			try{
+				i = Integer.parseInt(string);
+			}catch(Exception e) {
+				return "";
+			}
+			if(i<=10){
+				return "{0-12}";
+			}else {
+				if(i<=20){
+					return "{12-24}";
+				}else{
+					if(i<30){
+						return "{24-36}";
+					}else {
+						return "{36-48}";
+					}
 				}
+			}
+		}else{
+			if(string.length()>0){
+				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
+				if(c==10){
+					c=9;
+				}
+				float min = mins[var];
+				return (min+(c*divider[var]))+ "-" + (min+((c+1)*divider[var]));
+			}else{
+				return string;
 			}
 		}
 	}

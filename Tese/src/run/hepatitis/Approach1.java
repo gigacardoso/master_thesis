@@ -432,13 +432,13 @@ public class Approach1 {
 		//		cModel.buildClassifier(train);
 
 		// Test the model
-		//		Evaluation eTest = new Evaluation(test);
-		//		eTest.evaluateModel(cModel, test);
+//				Evaluation eTest = new Evaluation(test);
+//				eTest.evaluateModel(cModel, test);
 
 		// Print the result à la Weka explorer:
-		//		String strSummary = eTest.toSummaryString();
+//				String strSummary = eTest.toSummaryString();
 		//		System.out.println(cModel.toString());
-		//		System.out.println(strSummary);
+//				System.out.println(strSummary);
 		//		System.out.println("--------------------------------");
 
 		for (int i = 0; i < test.numInstances(); i++) {
@@ -448,7 +448,12 @@ public class Approach1 {
 			//			System.out.println("---------------");
 			labeled.instance(i).setClassValue(clsLabel);
 		}
-
+		
+		Evaluation eTest = new Evaluation(labeled);
+		eTest.evaluateModel(cModel, labeled);
+		System.out.println(eTest.toSummaryString());
+		
+		
 		BufferedWriter writer = new BufferedWriter(
 				new FileWriter(path+"labeled"+string+".arff"));
 		writer.write(labeled.toString());
