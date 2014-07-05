@@ -64,7 +64,7 @@ public class Approach2CreateData {
 		String svc = approach2Output +  stp+ "DiagnoseData.csv";
 
 		remove("DiagnoseData.csv",stp+"DiagnoseData.csv", approach2Output, stp);
-		System.out.println("removed");
+
 		BufferedReader inSVC = new BufferedReader(new FileReader(svc));
 		BufferedWriter[] writers = new BufferedWriter[10];
 		writers[0] = new BufferedWriter(new FileWriter(approach2Output+File.separator+"approach2_SVC2_"+steps+".csv"));

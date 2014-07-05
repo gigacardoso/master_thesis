@@ -33,27 +33,27 @@ public class CreateDataDiscret {
 		CreateDataDiscret create = new CreateDataDiscret();
 		try {
 			steps = 5;
-						create.diagnosticData();//DONE
-						create.diagnosticData2();//DONE
-			//			
-
-			//create.baseLineWithoutClass();//DONE
-			//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-			//			create.alternativeApproach(steps);
-			//			aa.createDataNoClass(steps);//DONE
-
-//						create.approach1(steps);
-//						Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); //DONE
-//						a1.createDataSVC(steps);
-//						a1.createDataVitals(steps);
-						
-						Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
-						a2.createData(steps);//DONE
+			create.diagnosticData();//DONE
+			create.diagnosticData2();//DONE
 
 
-			//			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
-			//			move.MoveAllData(steps);
-			//create.CleanData();
+			create.baseLineWithoutClass();//DONE
+			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
+			create.alternativeApproach(steps);
+			aa.createDataNoClass(steps);//DONE
+
+			create.approach1(steps);
+			Approach1CreateDataDiscret a1 = new Approach1CreateDataDiscret(approach1Output, steps); //DONE
+			a1.createDataSVC(steps);
+			a1.createDataVitals(steps);
+
+			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
+			a2.createData(steps);//DONE
+
+
+			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
+			move.MoveAllData(steps);
+			create.CleanData();
 
 			//			aa.createData(steps);
 			//			create.baseLineWithClass();
