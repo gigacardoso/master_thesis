@@ -33,24 +33,29 @@ public class CreateDataDiscret {
 		CreateDataDiscret create = new CreateDataDiscret();
 		try {
 			steps = 5;
-			create.diagnosticData();
-			//create.diagnosticData2();
+						create.diagnosticData();//DONE
+						create.diagnosticData2();//DONE
 			//			
-			//			create.alternativeApproach(steps);
+
+			//create.baseLineWithoutClass();//DONE
 			//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-			//			aa.createData(steps);
-			//			aa.createDataNoClass(steps);
-			//			create.approach1(steps);
-			//			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
-			//			a1.createDataSVC(steps);
-			//			a1.createDataVitals(steps);
-			//			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
-			//			a2.createData(steps);
-			//			create.baseLineWithoutClass();
+			//			create.alternativeApproach(steps);
+			//			aa.createDataNoClass(steps);//DONE
+
+//						create.approach1(steps);
+//						Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); //DONE
+//						a1.createDataSVC(steps);
+//						a1.createDataVitals(steps);
+						
+						Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
+						a2.createData(steps);//DONE
+
+
 			//			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
 			//			move.MoveAllData(steps);
 			//create.CleanData();
 
+			//			aa.createData(steps);
 			//			create.baseLineWithClass();
 
 		} catch (Exception ex) {
@@ -66,7 +71,6 @@ public class CreateDataDiscret {
 			DeleteFiles(cam + "Approach1Data");
 			DeleteFiles(cam + "DiagnosisData");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -107,7 +111,6 @@ public class CreateDataDiscret {
 			saver.writeBatch();
 			loader = new CSVLoader();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -209,7 +212,6 @@ public class CreateDataDiscret {
 													patient = last+ ",";
 													patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
 
-													//TODO
 													for(int i=0 ; i < steps-1; i++){
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
@@ -372,12 +374,13 @@ public class CreateDataDiscret {
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
+														patient += split4[4] + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-len)+i)).split(",",-1);
-														patient += split[2] + "," + split[5] + "," + split[6] + "," + split[7]+",";
+														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6])
+																+ "," + discretize(6,split[7])+",";
 														split3 = lines3.get(((lines3.size()-len)+i)).split(",",-1);
-														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
-																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
+														patient += discretize(7,split3[2]) + "," + discretize(8,split3[3]) + "," + discretize(9,split3[6]) + ","
+																+ discretize(10,split3[7]) + "," + discretize(11,split3[8]) + "," + discretize(12,split3[9]) + ",";
 														split2 = lines2.get(((lines2.size()-len)+i)).split(",",-1);
 														String discret = discretize(13,split2[15]);
 														patient += discret;
@@ -671,15 +674,16 @@ public class CreateDataDiscret {
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," + split4[11] + ","+ splitHeight[4] + ",";
+														patient += split4[4] + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-														patient += split[2] + "," + split[5] + "," + split[6] + "," + split[7]+",";
+														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6])
+																+ "," + discretize(6,split[7])+",";
 														split3 = lines3.get(((lines3.size()-steps)+i)).split(",",-1);
-														patient += split3[2] + "," + split3[3] + "," + split3[6] + ","
-																+ split3[7] + "," + split3[8] + "," + split3[9] + ",";
+														patient += discretize(7,split3[2]) + "," + discretize(8,split3[3]) + "," + discretize(9,split3[6]) + ","
+																+ discretize(10,split3[7]) + "," + discretize(11,split3[8]) + "," + discretize(12,split3[9]) + ",";
 														split2 = lines2.get((lines2.size()-1)).split(",",-1);
 														String discret = discretize(13,split2[15]);
-														patient +=  discret;
+														patient += discret;
 
 														out[i].write(patient+'\n');
 													}
@@ -972,6 +976,7 @@ public class CreateDataDiscret {
 		System.out.println("-----------------------------");
 	}
 
+	//removes patients that dont have at least countToRemove entries
 	private void remove(String pathToData, String string,String pathh, int countToRemove) throws FileNotFoundException, IOException {
 		System.out.println("remove");
 		BufferedReader in = new BufferedReader(new FileReader(path+File.separator+pathToData));

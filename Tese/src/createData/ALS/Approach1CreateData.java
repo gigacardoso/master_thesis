@@ -12,6 +12,11 @@ public class Approach1CreateData {
 	private String approach1Output;
 	private int steps;
 	
+	Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
+			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
+	Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,(float) 40,
+			(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
+	
 	public Approach1CreateData(String output, int steps) {
 		approach1Output= output;
 		this.steps = steps;
@@ -76,16 +81,16 @@ public class Approach1CreateData {
 
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += split[2] + ",";
-					att5 += split[5] + ",";
-					att6 += split[6] + ",";
-					att7 += split[7] + ",";
+					att2 += discretize(3,split[2]) + ",";
+					att5 += discretize(4,split[5]) + ",";
+					att6 += discretize(5,split[6])+ ",";
+					att7 += discretize(6,split[7]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += split[2];
-				att5 += split[5];
-				att6 += split[6];
-				att7 += split[7];
+				att2 += discretize(3,split[2]);
+				att5 += discretize(4,split[5]);
+				att6 += discretize(5,split[6]);
+				att7 += discretize(6,split[7]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -181,20 +186,20 @@ public class Approach1CreateData {
 				 att9 = last+ ",";
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += split[2] + ",";
-					att3 += split[3] + ",";
-					att6 += split[6] + ",";
-					att7 += split[7] + ",";
-					att8 += split[8] + ",";
-					att9 += split[9] + ",";
+					att2 += discretize(7,split[2]) + ",";
+					att3 += discretize(8,split[3]) + ",";
+					att6 += discretize(9,split[6]) + ",";
+					att7 += discretize(10,split[7]) + ",";
+					att8 += discretize(11,split[8]) + ",";
+					att9 += discretize(12,split[9]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += split[2];
-				att3 += split[3];
-				att6 += split[6];
-				att7 += split[7];
-				att8 += split[8];
-				att9 += split[9];
+				att2 += discretize(7,split[2]);
+				att3 += discretize(8,split[3]);
+				att6 += discretize(9,split[6]);
+				att7 += discretize(10,split[7]);
+				att8 += discretize(11,split[8]);
+				att9 += discretize(12,split[9]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -226,6 +231,42 @@ public class Approach1CreateData {
 		outSVC7.close();
 		outSVC8.close();
 		outSVC9.close();
+	}
+	
+	private  String discretize(int var ,String string) {
+		var--;
+		if(var ==12){ 
+			int i;
+			try{
+				i = Integer.parseInt(string);
+			}catch(Exception e) {
+				return "";
+			}
+			if(i<=10){
+				return "{0-12}";
+			}else {
+				if(i<=20){
+					return "{12-24}";
+				}else{
+					if(i<30){
+						return "{24-36}";
+					}else {
+						return "{36-48}";
+					}
+				}
+			}
+		}else{
+			if(string.length()>0){
+				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
+				if(c==10){
+					c=9;
+				}
+				float min = mins[var];
+				return (min+(c*divider[var]))+ "-" + (min+((c+1)*divider[var]));
+			}else{
+				return string;
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
