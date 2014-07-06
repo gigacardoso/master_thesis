@@ -734,7 +734,8 @@ public class Approach1 {
 			e.printStackTrace();
 		}
 	}
-
+	
+	
 	private HashMap<String, HashMap<Double, String>> getIndexes(String[] exams) throws IOException {
 		HashMap<String, HashMap<Double, String>> indexes = new HashMap<String, HashMap<Double,String>>();
 		for(String exam: exams){

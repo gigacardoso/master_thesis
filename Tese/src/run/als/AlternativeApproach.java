@@ -8,6 +8,8 @@ import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.Logistic;
+import weka.classifiers.meta.AdaBoostM1;
+import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -17,7 +19,7 @@ public class AlternativeApproach {
 	private static String path = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" +
 			File.separator + "FormatedData"+ File.separator + "AlternativeApproach" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = 6;
+	private final static int steps = 3;
 
 	public static void main(String[] args) {
 		AlternativeApproach aa = new AlternativeApproach();
@@ -30,11 +32,11 @@ public class AlternativeApproach {
 		System.out.println("----------------------------------------------------------");
 		System.out.println("------------------\tWITHOUT CLASS\t------------------");
 		aa.Classify(new NaiveBayes(), folds, "approach1_NoClass_"+steps);
-		aa.Classify(new RandomForest(), folds, "approach1_NoClass_"+steps);
-		//		aa.Classify(new J48(), folds, "approach1_NoClass_"+steps);
-		//		aa.Classify(new AdaBoostM1(), folds, "approach1_NoClass_"+steps);
+		aa.Classify(new J48(), folds, "approach1_NoClass_"+steps);
+		aa.Classify(new AdaBoostM1(), folds, "approach1_NoClass_"+steps);
 		//		aa.Classify(new MultilayerPerceptron(), folds, "approach1_NoClass_"+steps);
-		//		aa.Classify(new Logistic(), folds, "approach1_NoClass_"+steps);
+		aa.Classify(new Logistic(), folds, "approach1_NoClass_"+steps);
+		aa.Classify(new RandomForest(), folds, "approach1_NoClass_"+steps);
 	}
 
 	private void Classify(Classifier classifier, int folds, String file){

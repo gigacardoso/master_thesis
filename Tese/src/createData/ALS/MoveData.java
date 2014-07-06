@@ -79,7 +79,7 @@ public class MoveData {
 			create.DeleteFiles(baseline);
 			create.DeleteFiles(baselineNoClass);
 			for(int i=0; i< steps-1;i++){
-				copyFile(new File(diagnosis + "baseline"+i+".arff"), new File(baseline + File.separator + "baseline"+i+".arff"));
+				//copyFile(new File(diagnosis + "baseline"+i+".arff"), new File(baseline + File.separator + "baseline"+i+".arff"));
 				copyFile(new File(diagnosis + "baselineNoClass"+i+".arff"), new File(baselineNoClass + File.separator + "baselineNoClass"+i+".arff"));
 			}
 		} catch (IOException e) {
@@ -103,10 +103,28 @@ public class MoveData {
 			copyFile(new File(approach1 + "approach1_Vitals7_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Vitals7_"+steps+".csv"));
 			copyFile(new File(approach1 + "approach1_Vitals8_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Vitals8_"+steps+".csv"));
 			copyFile(new File(approach1 + "approach1_Vitals9_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Vitals9_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach1_Demo1_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Demo1_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach1_Demo2_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Demo2_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach1_Demo3_"+steps+".csv"), new File(approach1Out + File.separator + "approach1_Demo3_"+steps+".csv"));
+			
+			copyFile(new File(approach1 + "approach1_SVC2_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_SVC2_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_SVC5_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_SVC5_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_SVC6_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_SVC6_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_SVC7_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_SVC7_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals2_"+steps+".arff"), new File(approach1Out  + File.separator+ "approach1_Vitals2_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals3_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Vitals3_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals6_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Vitals6_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals7_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Vitals7_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals8_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Vitals8_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Vitals9_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Vitals9_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Demo1_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Demo1_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Demo2_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Demo2_"+steps+".arff"));
+			copyFile(new File(approach1 + "approach1_Demo3_"+steps+".arff"), new File(approach1Out + File.separator + "approach1_Demo3_"+steps+".arff"));
 			
 			copyFile(new File(diagnosis + "DiagnoseData.arff"), new File(approach1Out + File.separator + "DiagnoseData.arff"));
 			copyFile(new File(diagnosis + "DiagnoseData.csv"), new File(approach1Out + File.separator + "DiagnoseData.csv"));
 			copyFile(new File(diagnosis + "DiagnoseDataReal.arff"), new File(approach1Out + File.separator + "DiagnoseDataReal.arff"));
+			copyFile(new File(diagnosis + "DiagnoseDataReal.csv"), new File(approach1Out + File.separator + "DiagnoseDataReal.csv"));
 			
 //			copyFile(new File(approach1 + "PredictionDataWithDemo.csv"), new File(approach1Out + "PredictionDataWithDemo.csv"));
 //			copyFile(new File(approach1 + "PredictionDataWithoutDemo.csv"), new File(approach1Out + "PredictionDataWithoutDemo.csv"));
@@ -123,7 +141,7 @@ public class MoveData {
 		 try {
 			 CreateData create = new CreateData();
 			create.DeleteFiles(alternativeOut);
-			copyFile(new File(alternative + "approach1_"+steps+".arff"), new File(alternativeOut + File.separator + "approach1_"+steps+".arff"));
+			//copyFile(new File(alternative + "approach1_"+steps+".arff"), new File(alternativeOut + File.separator + "approach1_"+steps+".arff"));
 			copyFile(new File(alternative + "approach1_NoClass_"+steps+".arff"), new File(alternativeOut + File.separator + "approach1_NoClass_"+steps+".arff"));
 			
 		} catch (IOException e) {

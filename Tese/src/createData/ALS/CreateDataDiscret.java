@@ -23,16 +23,24 @@ public class CreateDataDiscret {
 	public static  String diagnosisOutput = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "DiagnosisData"+ File.separator;
 	private  HashMap<Integer,Boolean> _common = new HashMap<Integer, Boolean>();
 	public static  int steps;
+	
+	// 10 buckets
+//	public static Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
+//			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
+	
+	// 6 buckets
+	public static Float[] divider = {(float)10.167,(float)22.833,(float)19.5,(float)1.088,(float)0.907,
+		(float)0.915,(float)13.167,(float)21,(float)16.5,(float)8.5,(float)16.433,(float)38.05};
+	
+	public static Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,
+		(float) 40,	(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
 
-	Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
-			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
-	Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,(float) 40,
-			(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
-
+	public static int buckets = 6;	
+	
 	public static void main(String[] args) {
 		CreateDataDiscret create = new CreateDataDiscret();
 		try {
-			steps = 5;
+			steps = 3;
 			create.diagnosticData();//DONE
 			create.diagnosticData2();//DONE
 
@@ -46,6 +54,7 @@ public class CreateDataDiscret {
 			Approach1CreateDataDiscret a1 = new Approach1CreateDataDiscret(approach1Output, steps); //DONE
 			a1.createDataSVC(steps);
 			a1.createDataVitals(steps);
+			a1.createDataDemo(steps);
 
 			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
 			a2.createData(steps);//DONE
@@ -53,7 +62,7 @@ public class CreateDataDiscret {
 
 			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
 			move.MoveAllData(steps);
-			create.CleanData();
+//			create.CleanData();
 
 			//			aa.createData(steps);
 			//			create.baseLineWithClass();
@@ -93,7 +102,7 @@ public class CreateDataDiscret {
 
 	}
 
-	public  void CSV2arff(String path,String str){ 
+	public void CSV2arff(String path,String str){ 
 		// load CSV
 		CSVLoader loader = new CSVLoader();
 		try {
@@ -731,7 +740,7 @@ public class CreateDataDiscret {
 		}
 	}	
 
-	private  String discretize(int var ,String string) {
+	public String discretize(int var ,String string) {
 		var--;
 		if(var ==12){ 
 			int i;
@@ -756,11 +765,15 @@ public class CreateDataDiscret {
 		}else{
 			if(string.length()>0){
 				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
-				if(c==10){
-					c=9;
+				if(c==buckets){
+					c=buckets-1;
 				}
+				DecimalFormat df = new DecimalFormat("#.##");
 				float min = mins[var];
-				return (min+(c*divider[var]))+ "-" + (min+((c+1)*divider[var]));
+				
+				String s = df.format(min+(c*divider[var]))+ "-" + df.format(min+((c+1)*divider[var]));
+				s = s.replace(",",".");
+				return s;
 			}else{
 				return string;
 			}

@@ -12,11 +12,6 @@ public class Approach1CreateDataDiscret {
 	private String approach1Output;
 	private int steps;
 	
-	Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
-			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
-	Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,(float) 40,
-			(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
-	
 	public Approach1CreateDataDiscret(String output, int steps) {
 		approach1Output= output;
 		this.steps = steps;
@@ -59,7 +54,7 @@ public class Approach1CreateDataDiscret {
 		outSVC5.write(att5+'\n');
 		outSVC6.write(att6+'\n');
 		outSVC7.write(att7+'\n');
-
+		CreateDataDiscret t = new CreateDataDiscret();
 
 		//just the class of n+1
 		int last = 0;
@@ -81,16 +76,16 @@ public class Approach1CreateDataDiscret {
 
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += discretize(3,split[2]) + ",";
-					att5 += discretize(4,split[5]) + ",";
-					att6 += discretize(5,split[6])+ ",";
-					att7 += discretize(6,split[7]) + ",";
+					att2 += t.discretize(3,split[2]) + ",";
+					att5 += t.discretize(4,split[5]) + ",";
+					att6 += t.discretize(5,split[6])+ ",";
+					att7 += t.discretize(6,split[7]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += discretize(3,split[2]);
-				att5 += discretize(4,split[5]);
-				att6 += discretize(5,split[6]);
-				att7 += discretize(6,split[7]);
+				att2 += t.discretize(3,split[2]);
+				att5 += t.discretize(4,split[5]);
+				att6 += t.discretize(5,split[6]);
+				att7 += t.discretize(6,split[7]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -114,6 +109,13 @@ public class Approach1CreateDataDiscret {
 		outSVC5.close();
 		outSVC6.close();
 		outSVC7.close();
+		
+		CreateDataDiscret c = new CreateDataDiscret();
+		
+		c.CSV2arff(approach1Output+File.separator,"approach1_SVC2_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_SVC5_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_SVC6_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_SVC7_"+steps);
 	}
 
 	public void createDataVitals(int stp) throws IOException{
@@ -163,7 +165,7 @@ public class Approach1CreateDataDiscret {
 		outSVC8.write(att8+'\n');
 		outSVC9.write(att9+'\n');
 		
-		
+		CreateDataDiscret t = new CreateDataDiscret();
 		
 
 		int last = 0;
@@ -186,20 +188,20 @@ public class Approach1CreateDataDiscret {
 				 att9 = last+ ",";
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += discretize(7,split[2]) + ",";
-					att3 += discretize(8,split[3]) + ",";
-					att6 += discretize(9,split[6]) + ",";
-					att7 += discretize(10,split[7]) + ",";
-					att8 += discretize(11,split[8]) + ",";
-					att9 += discretize(12,split[9]) + ",";
+					att2 += t.discretize(7,split[2]) + ",";
+					att3 += t.discretize(8,split[3]) + ",";
+					att6 += t.discretize(9,split[6]) + ",";
+					att7 += t.discretize(10,split[7]) + ",";
+					att8 += t.discretize(11,split[8]) + ",";
+					att9 += t.discretize(12,split[9]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += discretize(7,split[2]);
-				att3 += discretize(8,split[3]);
-				att6 += discretize(9,split[6]);
-				att7 += discretize(10,split[7]);
-				att8 += discretize(11,split[8]);
-				att9 += discretize(12,split[9]);
+				att2 += t.discretize(7,split[2]);
+				att3 += t.discretize(8,split[3]);
+				att6 += t.discretize(9,split[6]);
+				att7 += t.discretize(10,split[7]);
+				att8 += t.discretize(11,split[8]);
+				att9 += t.discretize(12,split[9]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -231,42 +233,16 @@ public class Approach1CreateDataDiscret {
 		outSVC7.close();
 		outSVC8.close();
 		outSVC9.close();
-	}
-	
-	private  String discretize(int var ,String string) {
-		var--;
-		if(var ==12){ 
-			int i;
-			try{
-				i = Integer.parseInt(string);
-			}catch(Exception e) {
-				return "";
-			}
-			if(i<=10){
-				return "{0-12}";
-			}else {
-				if(i<=20){
-					return "{12-24}";
-				}else{
-					if(i<30){
-						return "{24-36}";
-					}else {
-						return "{36-48}";
-					}
-				}
-			}
-		}else{
-			if(string.length()>0){
-				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
-				if(c==10){
-					c=9;
-				}
-				float min = mins[var];
-				return (min+(c*divider[var]))+ "-" + (min+((c+1)*divider[var]));
-			}else{
-				return string;
-			}
-		}
+		
+		CreateDataDiscret c = new CreateDataDiscret();
+		
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals2_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals3_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals6_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals7_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals8_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals9_"+steps);
+		
 	}
 	
 	public static void main(String[] args) {
@@ -277,6 +253,91 @@ public class Approach1CreateDataDiscret {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
+	}
+
+	public void createDataDemo(int stp) throws IOException {
+		System.out.println("A1 - CreateDataDemo");
+		steps = stp;
+		String Vitals = approach1Output +  steps+ "DiagnoseData.csv";
+
+		BufferedReader inVitals = new BufferedReader(new FileReader(Vitals));
+		BufferedWriter outSVC2 = new BufferedWriter(new FileWriter(approach1Output+File.separator+"approach1_Demo1_"+steps+".csv"));
+		BufferedWriter outSVC5 = new BufferedWriter(new FileWriter(approach1Output+File.separator+"approach1_Demo2_"+steps+".csv"));
+		BufferedWriter outSVC6 = new BufferedWriter(new FileWriter(approach1Output+File.separator+"approach1_Demo3_"+steps+".csv"));
+
+		String line1;
+		line1 = inVitals.readLine();
+		
+		String[] split = line1.split(",",-1);
+		String att2 = split[0]+ ",";
+		String att3 = split[0]+ ",";
+		String att6 = split[0]+ ",";
+		//		patient += ",";
+		for(int i=0 ; i < steps-1; i++){
+			att2 += split[1]+"_"+i + ",";
+			att3 += split[2]+"_"+i + ",";
+			att6 += split[3]+"_"+i + ",";
+		}
+		att2 += split[1]+"_"+(steps-1);
+		att3 += split[2]+"_"+(steps-1);
+		att6 += split[3]+"_"+(steps-1);
+		outSVC2.write(att2+'\n');
+		outSVC5.write(att3+'\n');
+		outSVC6.write(att6+'\n');
+		
+		
+		
+
+		int last = 0;
+		ArrayList<String> lines1 = new ArrayList<String>();
+		while ((line1 = inVitals.readLine()) != null) {
+			String[] splited = line1.split(",",-1);
+			if(last == 0){
+				last = Integer.parseInt(splited[0]);
+				lines1.add(line1);
+				continue;
+			}
+			if(last == Integer.parseInt(splited[0])){
+				lines1.add(line1);
+			}else{
+				 att2 = last+ ",";
+				 att3 = last+ ",";
+				 att6 = last+ ",";
+				for(int i=0 ; i < steps-1; i++){
+					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
+					att2 += split[1] + ",";
+					att3 += split[2] + ",";
+					att6 += split[3] + ",";
+				}
+				split = lines1.get((lines1.size()-1)).split(",",-1);
+				att2 += split[1];
+				att3 += split[2];
+				att6 += split[3];
+				if(!split[2].isEmpty()){
+					outSVC2.write(att2+'\n');
+				}
+				if(!split[3].isEmpty()){
+					outSVC5.write(att3+'\n');
+				}
+				if(!split[6].isEmpty()){
+					outSVC6.write(att6+'\n');
+				}
+
+				lines1 = new ArrayList<String>();
+				last = Integer.parseInt(splited[0]);
+				lines1.add(line1);
+			}
+		}
+		inVitals.close();
+		outSVC2.close();
+		outSVC5.close();
+		outSVC6.close();
+		
+		CreateDataDiscret c = new CreateDataDiscret();
+		
+		c.CSV2arff(approach1Output+File.separator,"approach1_Demo1_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Demo2_"+steps);
+		c.CSV2arff(approach1Output+File.separator,"approach1_Demo3_"+steps);
 	}
 
 }

@@ -7,6 +7,9 @@ import java.util.Random;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.functions.Logistic;
+import weka.classifiers.meta.AdaBoostM1;
+import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 
@@ -17,7 +20,7 @@ public class Baseline {
 			File.separator + "FormatedData"+ File.separator + "Baseline" + File.separator;
 	private static String pathNoClass = path + "NoClass" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = 6;
+	private final static int steps = 3;
 
 	public static void main(String[] args) {
 		Baseline b = new Baseline();
@@ -33,10 +36,10 @@ public class Baseline {
 		//			b.Classify(new MultilayerPerceptron(), folds, "baseline"+i, path);
 		System.out.println("\n--------------------------\tWITHOUT CLASS\t--------------------------------");
 					b.Classify(new NaiveBayes(), folds, "baselineNoClass"+i, pathNoClass);
+					b.Classify(new J48(), folds, "baselineNoClass"+i, pathNoClass);
+					b.Classify(new AdaBoostM1(), folds, "baselineNoClass"+i, pathNoClass);
+					b.Classify(new Logistic(), folds, "baselineNoClass"+i, pathNoClass);
 					b.Classify(new RandomForest(), folds, "baselineNoClass"+i, pathNoClass);
-		//			b.Classify(new J48(), folds, "baselineNoClass"+i, pathNoClass);
-		//			b.Classify(new AdaBoostM1(), folds, "baselineNoClass"+i, pathNoClass);
-		//			b.Classify(new Logistic(), folds, "baselineNoClass"+i, pathNoClass);
 		//			b.Classify(new MultilayerPerceptron(), folds, "baselineNoClass"+i, pathNoClass);
 	}
 	}
