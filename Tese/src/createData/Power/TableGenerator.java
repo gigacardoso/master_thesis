@@ -3,6 +3,7 @@ package createData.Power;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import createData.ALS.CreateData;
 
 import utils.Utils;
 
@@ -19,16 +22,387 @@ public class TableGenerator {
 
 	public static void main(String[] args) {
 		try {
-			int steps = 10;
+			int steps = 3; //1435 (max)
 			TableGenerator t = new TableGenerator();
 			//t.createSum();
 			//t.stats(60);
 
-			//t.createDiscretDiagnosisData(5);
-			t.createDiagnosisReal(steps);
+//			t.createDiscretDiagnosisData(5);
+//			t.createDiagnosisReal(steps);
+//			t.countTimePoints("diagnosis_discret.csv");
+//			t.createApproach1PredictionData(steps);
+//			t.createApproach2PredictionData(steps);
+//			t.createBaselineSingleOb(steps);
+			t.createBaselineMultipleOb(steps);
+			t.convertToArff();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void convertToArff() {
+		File file = new File(path);
+		CreateData create =  new CreateData();
+		String[] myFiles;
+		if (file.isDirectory()) {
+			myFiles = file.list();
+			for (int i = 0; i < myFiles.length; i++) {
+				File myFile = new File(file, myFiles[i]);
+				if (!myFile.isDirectory() && myFile.getName().split("\\.")[1].equals("csv")) {
+					create.CSV2arff(path, myFile.getName().split("\\.")[0]);
+					try{
+						myFile.delete();
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	private void createBaselineMultipleOb(int steps) throws IOException {
+		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+
+		String line = inFact.readLine();
+		String[] splited = line.split(",", -1);
+		String headWithout = "";
+		for(int j= 0;j<steps-1;j++){
+			for(int i= 0;i<splited.length;i++){
+				if(i<splited.length-1){
+					headWithout += splited[i]+"_"+j+",";
+				}
+			}
+		}
+		headWithout += splited[splited.length-1]+"_class\n";
+		BufferedWriter without = new BufferedWriter(new FileWriter(path + "baselineMultiWithout.csv"));
+		without.write(headWithout);		
+		String id= null;
+		List<String> lines = new ArrayList<String>();
+		while((line = inFact.readLine()) != null){
+			splited = line.split(",");
+			if(id == null){
+				id = splited[0];
+				lines.add(line);			
+			}else {
+				if(splited[0].equals(id)){
+					lines.add(line);
+				}else{
+					if(	lines.size() >= steps){
+						System.out.println(id);
+						if(id.equals("77")){
+							@SuppressWarnings("unused")
+							int j= 0;
+						}
+						outputLineMultiBaseline(id,without,lines,steps);
+					}
+					id = splited[0];
+					lines = new ArrayList<String>();
+					lines.add(line);
+				}				
+			}
+		}
+		without.close();
+		inFact.close();
+	}
+
+	private void outputLineMultiBaseline(String id,
+			BufferedWriter without, List<String> lines, int steps) throws IOException {
+		int size = lines.size();
+
+		String entryWithoutClass = "";
+		for(int i =0 ; i< steps-1; i++){
+			String line = lines.get(size-steps+i);
+			String[] split = line.split(",",-1);
+			for(int j= 0; j<split.length; j++){
+				if(j < split.length-1){
+					entryWithoutClass += split[j]+ ",";
+				}
+			}
+		}
+		String[] last = lines.get(size-1).split(",",-1);
+		entryWithoutClass += last[last.length-1]+ "\n";
+		without.write(entryWithoutClass);
+	}
+	
+	private void createBaselineSingleOb(int steps) throws IOException {
+		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+
+		HashMap<Integer,BufferedWriter> without_all = new HashMap<Integer,BufferedWriter>();
+		String line = inFact.readLine();
+		String[] splited = line.split(",", -1);
+		String headWithout = "";
+		for(int i= 0;i<splited.length;i++){
+			if(i<splited.length-1){
+				headWithout += splited[i]+",";
+			}
+		}
+		headWithout += splited[splited.length-1]+"_class\n";
+		for(int i= 0;i<steps-1;i++){
+			BufferedWriter without = new BufferedWriter(new FileWriter(path + "baselineSingleWithout_"+i+"_.csv"));
+			without.write(headWithout);
+			without_all.put(i, without);
+		}
+
+		String id= null;
+		List<String> lines = new ArrayList<String>();
+		while((line = inFact.readLine()) != null){
+			splited = line.split(",");
+			if(id == null){
+				id = splited[0];
+				lines.add(line);			
+			}else {
+				if(splited[0].equals(id)){
+					lines.add(line);
+				}else{
+					if(	lines.size() >= steps){
+						System.out.println(id);
+						if(id.equals("77")){
+							@SuppressWarnings("unused")
+							int j= 0;
+						}
+						for(int i= 0;i<steps-1;i++){
+							BufferedWriter without = without_all.get(i);
+							outputLineSingleBaseline(id,without,lines,i,steps);
+						}
+					}
+					id = splited[0];
+					lines = new ArrayList<String>();
+					lines.add(line);
+				}				
+			}
+		}
+		for(int i= 0;i<steps-1;i++){
+			without_all.get(i).close();
+		}
+		inFact.close();
+	}
+
+	private void outputLineSingleBaseline(String id, BufferedWriter without,
+			List<String> lines, int i, int steps) throws IOException {
+		int size = lines.size();
+		String line = lines.get(size-steps+i);
+		String[] split = line.split(",",-1);
+		String entryWithoutClass = "";
+		for(int j= 0; j<split.length; j++){
+			if(j < split.length-1){
+				entryWithoutClass += split[j]+ ",";
+			}
+		}
+		String[] last = lines.get(size-1).split(",",-1);
+		entryWithoutClass += last[last.length-1]+ "\n";
+		without.write(entryWithoutClass);
+
+	}
+	
+	private void createApproach2PredictionData(int steps) throws IOException {
+		String[] exams = getVariables();
+		HashMap<String,Integer> indixes = new HashMap<String, Integer>();
+		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+		HashMap<Integer,BufferedWriter> writers = new HashMap<Integer,BufferedWriter>();
+		String line = inFact.readLine();
+		String[] splited = line.split(",");
+		for(int i= 0; i< exams.length; i++){
+			BufferedWriter table = new BufferedWriter(new FileWriter(path + exams[i]+"_2.csv"));
+			String entry = splited[0]+",";
+			for(int j= 0 ; j<steps-1; j++){
+				for(int k = 0; k< exams.length; k++){
+					entry += exams[k] +"_" + j + ",";
+				}
+			}
+			entry += exams[i] +"_" + (steps-1) + "\n";
+			table.write(entry);
+			writers.put(i, table);
+			indixes.put(exams[i], i);
+		}
+		String id= null;
+		List<List<String>> group = new ArrayList<List<String>>(exams.length);
+
+		while((line = inFact.readLine()) != null){
+			splited = line.split(",");
+			if(id == null){
+				id = splited[0];
+				for(int i= 0; i<exams.length; i++){
+					ArrayList<String> list = new ArrayList<String>();
+					list.add(splited[1+i]);
+					group.add(list);
+				}				
+				continue;
+			}else {
+				if(splited[0].equals(id)){
+					for(int i= 0; i<exams.length; i++){
+						group.get(i).add(splited[1+i]);
+					}	
+				}else{
+					if(	group.get(0).size() >= steps){
+//						System.out.println(id);
+						if(id.equals("77")){
+							@SuppressWarnings("unused")
+							int j= 0;
+						}
+						outputLineExams2(id,writers,group,steps);
+					}
+					id = splited[0];
+					group = new ArrayList<List<String>>(11);
+					for(int i= 0; i<exams.length; i++){
+						ArrayList<String> list = new ArrayList<String>();
+						list.add(splited[1+i]);
+						group.add(list);
+					}				
+				}
+			}
+		}
+		for(int i= 0; i< exams.length; i++){
+			writers.get(i).close();
+		}
+		inFact.close();
+	}
+
+	private void outputLineExams2(String id,
+			HashMap<Integer, BufferedWriter> writers, List<List<String>> group,
+			int steps) throws IOException {
+		String[] exams = getVariables();
+		int size = writers.keySet().size();
+		for(int i=0; i < size ; i++){
+			List<String> list = group.get(i);
+			int length = list.size();
+			String entry = id +",";
+			for(int j= length-steps ; j<length-1; j++){
+				for(int k = 0; k< exams.length; k++){
+					List<String> exam = group.get(k);
+					entry += exam.get(j)+ ",";
+				}
+			}
+			entry += list.get(length-1)+ "\n";
+			writers.get(i).write(entry);
+		}
+	}
+	
+	private void createApproach1PredictionData(int steps) throws IOException {
+		
+		HashMap<String,Integer> indixes = new HashMap<String, Integer>();
+		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+		String[] exams = getVariables();
+		HashMap<Integer,BufferedWriter> writers = new HashMap<Integer,BufferedWriter>();
+		String line = inFact.readLine();
+		String[] splited = line.split(",");
+		for(int i= 0; i< exams.length; i++){
+			BufferedWriter table = new BufferedWriter(new FileWriter(path + exams[i]+".csv"));
+			String entry = splited[0]+",";
+			for(int j= 0 ; j<steps-1; j++){
+				entry += exams[i] +"_" + j + ",";
+			}
+			entry += exams[i] +"_" + (steps-1) + "\n";
+			table.write(entry);
+			writers.put(i, table);
+			indixes.put(exams[i], i);
+		}
+		String id= null;
+		List<List<String>> group = new ArrayList<List<String>>(exams.length);
+
+		while((line = inFact.readLine()) != null){
+			splited = line.split(",");
+			if(id == null){
+				id = splited[0];
+				for(int i= 0; i<exams.length; i++){
+					ArrayList<String> list = new ArrayList<String>();
+					list.add(splited[1+i]);
+					group.add(list);
+				}				
+				continue;
+			}else {
+				if(splited[0].equals(id)){
+					for(int i= 0; i<exams.length; i++){
+						group.get(i).add(splited[1+i]);
+					}	
+				}else{
+					if(	group.get(0).size() >= steps){
+//						System.out.println(id);
+						outputLineExams(id,writers,group,steps);
+					}
+					id = splited[0];
+					group = new ArrayList<List<String>>(11);
+					for(int i= 0; i<exams.length; i++){
+						ArrayList<String> list = new ArrayList<String>();
+						list.add(splited[1+i]);
+						group.add(list);
+					}				
+				}
+			}
+		}
+		for(int i= 0; i< exams.length; i++){
+			writers.get(i).close();
+		}
+		inFact.close();
+	}
+	
+	private String[] getVariables() throws IOException {
+		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+		String header = in.readLine();
+		in.close();
+		String[] split = header.split(",",-1);
+		String[] result = new String[split.length-2];
+		for (int i = 1; i < split.length-1; i++) {
+			result[i-1] = split[i];
+		}
+		return result;
+	}
+
+	private void outputLineExams(String id, HashMap<Integer, BufferedWriter> writers, List<List<String>> group, int steps) throws IOException {
+		int size = writers.keySet().size();
+		for(int i=0; i < size ; i++){
+			List<String> list = group.get(i);
+			int length = list.size();
+			String entry = id +",";
+			for(int j= length-steps ; j<length-1; j++){
+				entry += list.get(j)+ ",";
+			}
+			entry += list.get(length-1)+ "\n";
+			writers.get(i).write(entry);
+		}
+	}
+	
+	private void countTimePoints(String string) throws IOException {
+		BufferedReader inFact = new BufferedReader(new FileReader(path + string));
+		HashMap<Integer,Integer> _counts = new HashMap<Integer,Integer>();
+		String line = inFact.readLine();
+		String id= null;
+		int count = 0 ;
+		while((line = inFact.readLine()) != null){
+			String[] splited = line.split(",");
+			if(id == null){
+				count = 1;
+				id = splited[0];
+				continue;
+			}else {
+				if(splited[0].equals(id)){
+					count++;
+				}else{
+					if(_counts.get(count) != null){
+						int c = _counts.get(count);
+						_counts.put(count, ++c);
+					}else{
+						_counts.put(count,1);
+					}
+					count = 1;
+					id = splited[0];
+				}
+			}
+		}
+		inFact.close();
+		double total = 0.0;
+		for(Integer i:_counts.keySet() ){
+			total += _counts.get(i);
+		}
+		System.out.println("Total - \t" + total);
+		double prev = 0;
+		DecimalFormat df = new DecimalFormat("#.#####");
+		for(Integer i:_counts.keySet() ){
+			int j = _counts.get(i);
+			double perc = (j*100)/total;
+			prev += perc;
+			System.out.println("Count "+ i + " - "+ j+"\t---> "+ df.format(perc) + " %\t| " + df.format(prev) +" %");
+		}
+		System.out.println("-----------------------------");
 	}
 	
 	private void createDiagnosisReal(int steps) throws IOException {
@@ -37,10 +411,8 @@ public class TableGenerator {
 		String line = inFact.readLine();
 		String[] splited = line.split(",", -1);
 		String headWithout = "";
-		for(int i= 0;i<splited.length;i++){
-			if(i<splited.length-1){
+		for(int i= 0;i<splited.length-1;i++){
 				headWithout += splited[i]+",";
-			}
 		}
 		headWithout += splited[splited.length-1]+"\n";
 		BufferedWriter without = new BufferedWriter(new FileWriter(path + "diagnosis_discret_real.csv"));
@@ -58,7 +430,7 @@ public class TableGenerator {
 					lines.add(line);
 				}else{
 					if(	lines.size() >= steps){
-						System.out.println(id);
+//						System.out.println(id);
 						outputLineDiagnosisReal(id,without,lines);
 					}
 					id = splited[0];
@@ -98,9 +470,10 @@ public class TableGenerator {
 		String line = in.readLine();
 		String[] split = line.split(",",-1);
 		String output = "Day,";
-		for (int i = 2; i < split.length; i++) {
+		for (int i = 2; i < split.length-1; i++) {
 			output += split[i] + ",";
 		}
+		output += split[split.length-1];
 		out.write(output + "\n");
 		String last = null;
 		int day = -1;
@@ -130,8 +503,8 @@ public class TableGenerator {
 		in.close();
 		out.close();
 
-		Utils u = new Utils();
-		u.CSV2arff(path, "diagnosis_discret");
+		//Utils u = new Utils();
+		//u.CSV2arff(path, "diagnosis_discret");
 	}
 
 	private ArrayList<Double> createDistributionBuckets(int n_buckets, int error) throws IOException {
@@ -213,7 +586,7 @@ public class TableGenerator {
 
 		String header = in.readLine();
 		header = header.replace(";",",");
-		header += ", PowerClass";
+		header += ",PowerClass";
 		out.write(header + "\n");
 		String line;
 		String[] split;
