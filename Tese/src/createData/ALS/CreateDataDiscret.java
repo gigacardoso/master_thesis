@@ -41,8 +41,8 @@ public class CreateDataDiscret {
 		CreateDataDiscret create = new CreateDataDiscret();
 		try {
 			steps = 3;
-//			create.diagnosticData();//DONE
-//			create.diagnosticData2();//DONE
+			create.diagnosticData();//DONE
+			create.diagnosticData2();//DONE
 //
 //
 //			create.baseLineWithoutClass();//DONE
