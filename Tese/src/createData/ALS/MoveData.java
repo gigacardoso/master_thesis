@@ -57,10 +57,15 @@ public class MoveData {
 			copyFile(new File(approach1 + "approach2_Vitals7_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Vitals7_"+steps+".csv"));
 			copyFile(new File(approach1 + "approach2_Vitals8_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Vitals8_"+steps+".csv"));
 			copyFile(new File(approach1 + "approach2_Vitals9_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Vitals9_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach2_Demo1_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Demo1_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach2_Demo2_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Demo2_"+steps+".csv"));
+			copyFile(new File(approach1 + "approach2_Demo3_"+steps+".csv"), new File(approach2Out + File.separator + "approach2_Demo3_"+steps+".csv"));
+			
 			
 			copyFile(new File(diagnosis + "DiagnoseData.arff"), new File(approach2Out + File.separator + "DiagnoseData.arff"));
 			copyFile(new File(diagnosis + "DiagnoseData.csv"), new File(approach2Out + File.separator + "DiagnoseData.csv"));
 			copyFile(new File(diagnosis + "DiagnoseDataReal.arff"), new File(approach2Out + File.separator + "DiagnoseDataReal.arff"));
+			copyFile(new File(diagnosis + "DiagnoseDataReal.csv"), new File(approach2Out + File.separator + "DiagnoseDataReal.csv"));
 			
 //			copyFile(new File(approach1 + "PredictionDataWithDemo.csv"), new File(approach1Out + "PredictionDataWithDemo.csv"));
 //			copyFile(new File(approach1 + "PredictionDataWithoutDemo.csv"), new File(approach1Out + "PredictionDataWithoutDemo.csv"));
