@@ -35,11 +35,11 @@ public class Baseline {
 //		b.Classify(new Logistic(), folds, "baseline"+i, path);
 		//			b.Classify(new MultilayerPerceptron(), folds, "baseline"+i, path);
 		System.out.println("\n--------------------------\tWITHOUT CLASS\t--------------------------------");
-					b.Classify(new NaiveBayes(), folds, "baselineNoClass"+i, pathNoClass);
+//					b.Classify(new NaiveBayes(), folds, "baselineNoClass"+i, pathNoClass);
 					b.Classify(new J48(), folds, "baselineNoClass"+i, pathNoClass);
-					b.Classify(new AdaBoostM1(), folds, "baselineNoClass"+i, pathNoClass);
-					b.Classify(new Logistic(), folds, "baselineNoClass"+i, pathNoClass);
-					b.Classify(new RandomForest(), folds, "baselineNoClass"+i, pathNoClass);
+//					b.Classify(new AdaBoostM1(), folds, "baselineNoClass"+i, pathNoClass);
+//					b.Classify(new Logistic(), folds, "baselineNoClass"+i, pathNoClass);
+//					b.Classify(new RandomForest(), folds, "baselineNoClass"+i, pathNoClass);
 		//			b.Classify(new MultilayerPerceptron(), folds, "baselineNoClass"+i, pathNoClass);
 	}
 	}

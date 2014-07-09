@@ -62,13 +62,13 @@ public class Approach1 {
 
 			//			startClassification = System.currentTimeMillis();
 			//			
-						a.ClassifyData(new NaiveBayes());
-						endNaive = System.currentTimeMillis();
-						a.buildConfussionMatrix("Naive Bayes");
-			//			
-						a.ClassifyData(new RandomForest());
-						endRF = System.currentTimeMillis();
-						a.buildConfussionMatrix("RandomForest");
+//						a.ClassifyData(new NaiveBayes());
+//						endNaive = System.currentTimeMillis();
+//						a.buildConfussionMatrix("Naive Bayes");
+//
+//						a.ClassifyData(new RandomForest());
+//						endRF = System.currentTimeMillis();
+//						a.buildConfussionMatrix("RandomForest");
 						
 						a.ClassifyData(new J48());
 						endDT = System.currentTimeMillis();
@@ -443,9 +443,11 @@ public class Approach1 {
 		cModel.setClassifier(classifier);
 		// train and make predictions
 		cModel.buildClassifier(train);
-
+		
 		//		System.out.println("----------------------------------------");
-		//		System.out.println(cModel.toString());
+		BufferedWriter m = new BufferedWriter(new FileWriter(path+"model.txt"));
+				m.write(cModel.toString());
+				m.close();
 
 		// Test the model
 		//		Evaluation eTest = new Evaluation(test);
@@ -644,7 +646,8 @@ public class Approach1 {
 						Double d = cModel.classifyInstance(i);
 						//						System.out.println("\t-> "+d);
 						String ins = (i.toString().split(","))[0];
-						vitals.put(Integer.parseInt(ins) , d+"");
+						String estimation = examType(exam, d);
+						vitals.put(Integer.parseInt(ins) , estimation);
 					}					
 					examsAll.put(exam, vitals);
 				}
@@ -746,6 +749,28 @@ public class Approach1 {
 	//		}
 	//		return indexes;
 	//	}
+
+	private String examType(String exam, Double d) {
+		String result = "";
+		switch(exam){
+		case "Sub_metering_1":
+			int i = (int) Math.round(d);
+			result = i+"";
+			break;
+		case "Sub_metering_2":
+			i = (int) Math.round(d);
+			result = i+"";
+			break;
+		case "Sub_metering_3":
+			i = (int) Math.round(d);
+			result = i+"";
+			break;
+			default:
+				result = d+"";
+				break;
+		}
+		return result;
+	}
 
 	private String[] getVariables() throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));

@@ -3,7 +3,6 @@ package createData.Power;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,22 +13,34 @@ import java.util.List;
 
 import createData.ALS.CreateData;
 
-import utils.Utils;
-
-public class TableGenerator {
+public class TableGeneratorDiscret {
 
 	public  String path = "C:" + File.separator + "Power" + File.separator;
-
+	HashMap<String,Double> MINS = new HashMap<String, Double>();
+	HashMap<String,Double> MAXS = new HashMap<String, Double>();
+	public static final int num_buckets = 20;
+	public static final int steps = 100; //1435 (max)
+	public static final int num_classes = 10;
+	public static final int days = 500;
+	
+	
 	public static void main(String[] args) {
 		try {
-			int steps = 3; //1435 (max)
-			TableGenerator t = new TableGenerator();
-			t.createSum(431); //max - 1431
+			System.out.println("Generate");
+			System.out.println("Steps\t- " + steps);
+			System.out.println("Num Buckets\t- " + num_buckets);
+			System.out.println("Num Classes\t- " + num_classes);
+			System.out.println("Days\t- " + days);
+			
+			TableGeneratorDiscret t = new TableGeneratorDiscret();
+			t.createSum(days); //max - 1431 //700 - 25% impr J48 // 1400 - 35% impr  
 			//t.stats(60);
-
-			t.createDiscretDiagnosisData(5);
+			t.createDiagnosisDataWithClass(num_classes);
+			
+			t.createDiscretDiagnostic(num_buckets);
+			
 			t.createDiagnosisReal(steps);
-			t.countTimePoints("diagnosis_discret.csv");
+//			t.countTimePoints("diagnosis_discret.csv");
 			t.createApproach1PredictionData(steps);
 			t.createApproach2PredictionData(steps);
 			t.createBaselineSingleOb(steps);
@@ -40,7 +51,82 @@ public class TableGenerator {
 		}
 	}
 	
+	private void createDiscretDiagnostic(int num_buckets) throws IOException {
+		System.out.println("createDiscretDiagnostic");
+		
+		findMinMax();
+		
+		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_class.csv" ));
+		BufferedWriter out = new BufferedWriter(new FileWriter(path + "diagnosis_discret.csv"));
+		String tmp = in.readLine();
+		String[] header = tmp.split(",",-1);
+		out.write(tmp+ "\n");
+		
+		String line, output;
+		String[] split;
+		while((line = in.readLine()) != null){
+			split = line.split(",",-1);
+			output = split[0] + ",";
+			for (int i = 1; i < split.length-1; i++) {
+				Double d = Double.parseDouble(split[i]);
+				String discretized = discretizeVariable(header[i], d, num_buckets);
+				output += discretized + ",";
+			}
+			output += split[split.length-1];
+			out.write(output + "\n");
+		}
+		in.close();
+		out.close();
+	}
+
+	private String discretizeVariable(String variable, Double d, Integer num_buckets) {
+//		System.out.println("\tdiscretizeVariable");
+		Double min = MINS.get(variable);
+		Double max = MAXS.get(variable);
+		double bucket_size = (max-min)/num_buckets;
+		double g = (d-min)/bucket_size;
+		int bucket = (int) (g);
+		if(bucket == num_buckets){
+			bucket--;
+		}
+		return "["+variable+"_"+bucket+"]";
+	}
+
+	private void findMinMax() throws IOException {
+		System.out.println("\t findMinMax");
+		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_class.csv" ));
+		String[] header = in.readLine().split(",",-1);
+		for (int i = 1; i < header.length-1; i++) {
+			String var = header[i];
+			MINS.put(var, Double.MAX_VALUE);
+			MAXS.put(var, Double.MIN_VALUE);
+		}
+		
+		String line;
+		String[] split;
+		while((line = in.readLine()) != null){
+			split = line.split(",",-1);
+			for (int i = 1; i < split.length-1; i++) {
+				Double d = Double.parseDouble(split[i]);
+				if(d > MAXS.get(header[i])){
+					MAXS.put(header[i], d);
+				}
+				if(d < MINS.get(header[i])){
+					MINS.put(header[i], d);
+				}
+			}
+		}
+		in.close();
+//		for (int i = 1; i < header.length-1; i++) {
+//			String string = header[i];
+//			System.out.println(string);
+//			System.out.println("min - " + MINS.get(string));
+//			System.out.println("max - " + MAXS.get(string));
+//		}
+	}
+
 	private void convertToArff() {
+		System.out.println("convertToArff");
 		File file = new File(path);
 		CreateData create =  new CreateData();
 		String[] myFiles;
@@ -61,6 +147,7 @@ public class TableGenerator {
 	}
 	
 	private void createBaselineMultipleOb(int steps) throws IOException {
+		System.out.println("createBaselineMultipleOb");
 		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
 
 		String line = inFact.readLine();
@@ -107,6 +194,7 @@ public class TableGenerator {
 
 	private void outputLineMultiBaseline(String id,
 			BufferedWriter without, List<String> lines, int steps) throws IOException {
+//		System.out.println("\t outputLineMultiBaseline");
 		int size = lines.size();
 
 		String entryWithoutClass = "";
@@ -126,7 +214,7 @@ public class TableGenerator {
 	
 	private void createBaselineSingleOb(int steps) throws IOException {
 		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
-
+		System.out.println("createBaselineSingleOb");
 		HashMap<Integer,BufferedWriter> without_all = new HashMap<Integer,BufferedWriter>();
 		String line = inFact.readLine();
 		String[] splited = line.split(",", -1);
@@ -179,6 +267,7 @@ public class TableGenerator {
 
 	private void outputLineSingleBaseline(String id, BufferedWriter without,
 			List<String> lines, int i, int steps) throws IOException {
+//		System.out.println("\t outputLineSingleBaseline");
 		int size = lines.size();
 		String line = lines.get(size-steps+i);
 		String[] split = line.split(",",-1);
@@ -195,6 +284,7 @@ public class TableGenerator {
 	}
 	
 	private void createApproach2PredictionData(int steps) throws IOException {
+		System.out.println("createApproach2PredictionData");
 		String[] exams = getVariables();
 		HashMap<String,Integer> indixes = new HashMap<String, Integer>();
 		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
@@ -239,7 +329,7 @@ public class TableGenerator {
 							@SuppressWarnings("unused")
 							int j= 0;
 						}
-						outputLineExams2(id,writers,group,steps);
+						outputLineExams2(id,writers,group,steps, exams);
 					}
 					id = splited[0];
 					group = new ArrayList<List<String>>(11);
@@ -259,8 +349,8 @@ public class TableGenerator {
 
 	private void outputLineExams2(String id,
 			HashMap<Integer, BufferedWriter> writers, List<List<String>> group,
-			int steps) throws IOException {
-		String[] exams = getVariables();
+			int steps, String[] exams) throws IOException {
+//		System.out.println("\t outputLineExams2");
 		int size = writers.keySet().size();
 		for(int i=0; i < size ; i++){
 			List<String> list = group.get(i);
@@ -278,7 +368,7 @@ public class TableGenerator {
 	}
 	
 	private void createApproach1PredictionData(int steps) throws IOException {
-		
+		System.out.println("createApproach1PredictionData");
 		HashMap<String,Integer> indixes = new HashMap<String, Integer>();
 		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
 		String[] exams = getVariables();
@@ -336,6 +426,7 @@ public class TableGenerator {
 	}
 	
 	private String[] getVariables() throws IOException {
+		System.out.println("\t\t getVariables");
 		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
 		String header = in.readLine();
 		in.close();
@@ -348,6 +439,7 @@ public class TableGenerator {
 	}
 
 	private void outputLineExams(String id, HashMap<Integer, BufferedWriter> writers, List<List<String>> group, int steps) throws IOException {
+//		System.out.println("\t outputLineExams");
 		int size = writers.keySet().size();
 		for(int i=0; i < size ; i++){
 			List<String> list = group.get(i);
@@ -362,6 +454,7 @@ public class TableGenerator {
 	}
 	
 	private void countTimePoints(String string) throws IOException {
+		System.out.println("countTimePoints");
 		BufferedReader inFact = new BufferedReader(new FileReader(path + string));
 		HashMap<Integer,Integer> _counts = new HashMap<Integer,Integer>();
 		String line = inFact.readLine();
@@ -406,6 +499,7 @@ public class TableGenerator {
 	}
 	
 	private void createDiagnosisReal(int steps) throws IOException {
+		System.out.println("createDiagnosisReal");
 		BufferedReader inFact = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
 
 		String line = inFact.readLine();
@@ -445,6 +539,7 @@ public class TableGenerator {
 
 	private void outputLineDiagnosisReal(String id, BufferedWriter without,
 			List<String> lines) throws IOException {
+//		System.out.println("\t outputLineDiagnosisReal");
 		int size = lines.size();
 		String line = lines.get(size-1);
 		String[] split = line.split(",",-1);
@@ -459,14 +554,15 @@ public class TableGenerator {
 		without.write(entryWithoutClass);
 	}
 
-	private void createDiscretDiagnosisData(int num_buckets) throws IOException {
+	private void createDiagnosisDataWithClass(int num_buckets) throws IOException {
+		System.out.println("createDiagnosisDataWithClass");
 		ArrayList<Double> b = this.createDistributionBuckets(num_buckets, 2);
 		ArrayList<String> classes = new ArrayList<String>();
 		for (int i = 0; i < num_buckets; i++) {
 			classes.add("["+i+"]");
 		}
 		BufferedReader in = new BufferedReader(new FileReader(path + "power.csv" ));
-		BufferedWriter out = new BufferedWriter(new FileWriter(path+"diagnosis_discret.csv"));
+		BufferedWriter out = new BufferedWriter(new FileWriter(path+"diagnosis_class.csv"));
 		String line = in.readLine();
 		String[] split = line.split(",",-1);
 		String output = "Day,";
@@ -508,6 +604,7 @@ public class TableGenerator {
 	}
 
 	private ArrayList<Double> createDistributionBuckets(int n_buckets, int error) throws IOException {
+		System.out.println("\t createDistributionBuckets");
 		BufferedReader in = new BufferedReader(new FileReader(path + "power.csv" ));
 		//BufferedWriter out = new BufferedWriter(new FileWriter(path+"power_stats.csv"));
 		int classes = 100;
@@ -571,17 +668,18 @@ public class TableGenerator {
 			borders.add(max_border);
 		}
 
-
-		System.out.println("Total - "+ total);
-		DecimalFormat df = new DecimalFormat("#.##");
-		for(i = 0;i < n_buckets;i++){
-			System.out.println("Bucket "+ i +" ["+df.format(borders.get(i))+";"+ df.format(borders.get(i+1)) + "] - " + bucket_counts.get(i) + " = " + ((((double) bucket_counts.get(i))/total)*100)+ "%" );
-		}
+//TODO
+//		System.out.println("Total - "+ total);
+//		DecimalFormat df = new DecimalFormat("#.##");
+//		for(i = 0;i < n_buckets;i++){
+//			System.out.println("Bucket "+ i +" ["+df.format(borders.get(i))+";"+ df.format(borders.get(i+1)) + "] - " + bucket_counts.get(i) + " = " + ((((double) bucket_counts.get(i))/total)*100)+ "%" );
+//		}
 		return borders;
 	}
 
 	private void createSum(Integer days) throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(path + "power_consumption.txt" ));
+		System.out.println("createSum");
+		BufferedReader in = new BufferedReader(new FileReader(path + "Use\\"+"power_consumption.txt"));
 		BufferedWriter out = new BufferedWriter(new FileWriter(path+"power.csv"));
 		
 		if(days == null || days > 1431){
@@ -635,6 +733,7 @@ public class TableGenerator {
 
 	//Gives distribution of classes  
 	private void stats(int classes) throws IOException {
+		System.out.println("Stats");
 		BufferedReader in = new BufferedReader(new FileReader(path + "power.csv" ));
 		//BufferedWriter out = new BufferedWriter(new FileWriter(path+"power_stats.csv"));
 		in.readLine();

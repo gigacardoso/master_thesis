@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Random;
 
+import createData.Power.TableGeneratorDiscret;
+
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -18,18 +20,18 @@ public class BaselineSingle {
 
 	private static String path = "C:" + File.separator + "Power" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = 3;
+	private final static int steps = TableGeneratorDiscret.steps;
 
 	public static void main(String[] args) {
 		BaselineSingle b = new BaselineSingle();
 		
 		for(int i=0;i<steps-1;i++){
 			System.out.println("------------------\tBaseline "+ i + " -> " + (steps-1) + "\t------------------");
-			b.Classify(new NaiveBayes(), folds, "baselineSingleWithout_"+i+"_", path);
-			b.Classify(new RandomForest(), folds, "baselineSingleWithout_"+i+"_", path);
+//			b.Classify(new NaiveBayes(), folds, "baselineSingleWithout_"+i+"_", path);
+//			b.Classify(new RandomForest(), folds, "baselineSingleWithout_"+i+"_", path);
 			b.Classify(new J48(), folds, "baselineSingleWithout_"+i+"_", path);
-			b.Classify(new AdaBoostM1(), folds, "baselineSingleWithout_"+i+"_", path);
-			b.Classify(new Logistic(), folds, "baselineSingleWithout_"+i+"_", path);
+//			b.Classify(new AdaBoostM1(), folds, "baselineSingleWithout_"+i+"_", path);
+//			b.Classify(new Logistic(), folds, "baselineSingleWithout_"+i+"_", path);
 		}
 	}
 
