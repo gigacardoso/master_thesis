@@ -4,23 +4,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Random;
 
-import createData.Power.TableGeneratorDiscret;
-
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.functions.Logistic;
-import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.trees.J48;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import createData.Power.TableGeneratorDiscretEDP;
 
 
 public class BaselineSingle {
 
 	private static String path = "C:" + File.separator + "Power" + File.separator;
 	private final static int folds = 10;
-	private final static int steps = TableGeneratorDiscret.steps;
+	private final static int steps = TableGeneratorDiscretEDP.steps;
 
 	public static void main(String[] args) {
 		BaselineSingle b = new BaselineSingle();

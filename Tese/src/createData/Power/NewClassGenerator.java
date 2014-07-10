@@ -14,19 +14,19 @@ public class NewClassGenerator {
 	public  String path = "C:" + File.separator + "Power" + File.separator;
 	HashMap<String,Double> MINS = new HashMap<String, Double>();
 	HashMap<String,Double> MAXS = new HashMap<String, Double>();
-	public static final int num_buckets = 20;
-	public static final int steps = 100; //1435 (max)
-	public static final int num_classes = 10;
-	public static final Integer days = null;
+//	public static final int num_buckets = 20;
+//	public static final int steps = 100; //1435 (max)
+//	public static final int num_classes = 10;
+	public static final Integer days = 300;
 	
 	
 	public static void main(String[] args) {
 		try {
 			System.out.println("Generate");
-			System.out.println("Steps\t- " + steps);
-			System.out.println("Num Buckets\t- " + num_buckets);
-			System.out.println("Num Classes\t- " + num_classes);
-			System.out.println("Days\t- " + days);
+//			System.out.println("Steps\t- " + steps);
+//			System.out.println("Num Buckets\t- " + num_buckets);
+//			System.out.println("Num Classes\t- " + num_classes);
+//			System.out.println("Days\t- " + days);
 			
 			NewClassGenerator t = new NewClassGenerator();
 			t.createSum(days); //max - 1431 //700 - 25% impr J48 // 1400 - 35% impr
@@ -39,6 +39,7 @@ public class NewClassGenerator {
 			t.createDailyData();
 			t.addClass();
 			t.countClass();
+			t.generatePowerData("diagnosis_class.csv");
 //			t.createDiagnosisDataWithClass(num_classes);
 //			
 //			t.createDiscretDiagnostic(num_buckets);
@@ -54,8 +55,55 @@ public class NewClassGenerator {
 			e.printStackTrace();
 		}
 	}
+	
+	public void generateEDPClassData(Integer d, String file_name){
+		try {
+			createSum(d); //max - 1431 //700 - 25% impr J48 // 1400 - 35% impr
+			create30min();
+			addSimplePrice();
+			addBiPrice();
+			addTriPrice();
+			createDailyData();
+			addClass();
+			countClass();
+			generatePowerData(file_name);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	
+	private void generatePowerData(String file) throws IOException {
+		BufferedReader in = new BufferedReader(new FileReader(path + "power_class.csv" ));
+		BufferedWriter out = new BufferedWriter(new FileWriter(path+file));
+		String line = in.readLine();
+		String[] split = line.split(",",-1);
+		String output = "Week,";
+		for (int i = 1; i < split.length-4; i++) {
+			output += split[i] + ",";
+		}
+		output += split[split.length-1] +"\n";
+		out.write(output);
+		int days = -1;
+		int week = 0;
+		while((line = in.readLine()) != null){
+			split = line.split(",",-1);
+			days++;
+			if(days > 6){
+				days = 0;
+				week++;
+			}
+			output = week + ",";
+			for (int i = 1; i < split.length-4; i++) {
+				output += split[i] + ",";
+			}
+			output += split[split.length-1] +"\n";
+			out.write(output);
+		}
+		in.close();
+		out.close();
+	}
+
 	private void countClass() throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(path + "power_class.csv" ));
 		String line = in.readLine();
@@ -75,10 +123,11 @@ public class NewClassGenerator {
 			total++;
 		}
 		in.close();
-		System.out.println("Stats");
+		System.out.println("\nStats");
 		System.out.println("Total \t- "+ total);
+		System.out.println("-------------------");
 		for (String string : counts.keySet()) {
-			System.out.println(string + "\t- "+ counts.get(string));			
+			System.out.println(string + "\t- "+ counts.get(string) + " (" + ((double) counts.get(string) / (double) total)* 100 + " %)");			
 		}
 	}
 
@@ -177,7 +226,7 @@ public class NewClassGenerator {
 	private void addSimplePrice() throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(path + "power_30.csv" ));
 		BufferedWriter out = new BufferedWriter(new FileWriter(path+"power_simple.csv"));
-		Double price = 0.0764;
+		Double price = 0.0785; // 0.0764;
 		String line = in.readLine();
 		String[] split = line.split(",",-1);
 		String output = line + ",simple";
@@ -224,7 +273,12 @@ public class NewClassGenerator {
 		double econ = 0.0473;
 		//double super_econ = ;
 		int hour = Integer.parseInt(time.split(":")[0]);
-		if(hour >= 8 && hour <= 22){
+//		if(hour >= 8 && hour <= 22){
+//			return normal;
+//		}else{
+//			return econ;
+//		}
+		if(hour >= 9 && hour <= 22){
 			return normal;
 		}else{
 			return econ;
@@ -276,15 +330,24 @@ public class NewClassGenerator {
 		double super_econ = 0.0473;
 		int hour = Integer.parseInt(time.split(":")[0]);
 		int min = Integer.parseInt(time.split(":")[1]);
-		if(hour < 8 || hour >= 22){
+//		if(hour < 8 || hour >= 22){
+//			return super_econ;
+//		}
+//		if((hour>10 && hour < 13) || (hour == 10 && min == 30)){
+//			return normal;	
+//		}
+//		if((hour>19 && hour < 21) || (hour == 19 && min == 30)){
+//			return normal;	
+//		}
+		if(hour < 9 || hour >= 22){
 			return super_econ;
 		}
-		if((hour>10 && hour < 13) || (hour == 10 && min == 30)){
+		if((hour>11 && hour < 13) || (hour == 11 && min == 30)){
 			return normal;	
 		}
-		if((hour>19 && hour < 21) || (hour == 19 && min == 30)){
+		if((hour>20 && hour < 21) || (hour == 20 && min == 30)){
 			return normal;	
-		}
+		}		
 		return econ;
 	}
 	private double getWinterTriPrice(String time) {
@@ -293,13 +356,22 @@ public class NewClassGenerator {
 		double super_econ = 0.0473;
 		int hour = Integer.parseInt(time.split(":")[0]);
 		int min = Integer.parseInt(time.split(":")[1]);
-		if(hour < 8 || hour >= 22){
+//		if(hour < 8 || hour >= 22){
+//			return super_econ;
+//		}
+//		if((hour >= 9 && hour <= 10) || (hour == 10 && min == 30)){
+//			return normal;	
+//		}
+//		if((hour >= 18 && hour <= 20) || (hour == 20 && min == 30)){
+//			return normal;	
+//		}
+		if(hour < 9 || hour >= 22){
 			return super_econ;
 		}
-		if((hour >= 9 && hour <= 10) || (hour == 10 && min == 30)){
+		if((hour > 9 && hour <= 10)){ //|| (hour == 10 && min == 30)){
 			return normal;	
 		}
-		if((hour >= 18 && hour <= 20) || (hour == 20 && min == 30)){
+		if((hour >= 19 && hour <= 20) || (hour == 20 && min == 30)){
 			return normal;	
 		}
 		return econ;

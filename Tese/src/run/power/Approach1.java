@@ -6,32 +6,31 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 import utils.DefaultHashMap;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.LinearRegression;
-import weka.classifiers.functions.Logistic;
-import weka.classifiers.meta.AdaBoostM1;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.trees.J48;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 import weka.filters.unsupervised.attribute.Remove;
 import createData.ALS.CreateData;
 import createData.ALS.CreateDataDiscret;
+import createData.Power.TableGeneratorDiscret;
+import createData.Power.TableGeneratorEDP;
 
 public class Approach1 {
 	private  String path = "C:" + File.separator + "Power" + File.separator;
 	private  HashMap<String,DefaultHashMap<Integer,String>> examsAll = new HashMap<String,DefaultHashMap<Integer,String>>();
-	private HashMap<String, String> classes = new HashMap<String, String>();
+	private HashMap<String, String> discret_symbols = new HashMap<String, String>();
+	private String[] final_class = {"Simple", "Bi", "Tri"};
 	private  int steps = 3;
 	private  int folds = 10;
 
@@ -39,6 +38,10 @@ public class Approach1 {
 	static long start,vitals,SVC,predictions,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 		try {
+			System.out.println("Approach1");
+			System.out.println("Steps\t- " + TableGeneratorEDP.steps);
+			System.out.println("Days\t- " + TableGeneratorEDP.days);
+			
 			Approach1 a = new Approach1();
 			a.examsTime = new long[a.getVariables().length];
 			a.examsAll = new HashMap<String,DefaultHashMap<Integer,String>>();
@@ -54,12 +57,18 @@ public class Approach1 {
 			//					System.out.println("\t" + c);
 			//				}
 			//			}
+			System.out.println("changing");
 
-
+			System.out.println("changed");
 			predictions = System.currentTimeMillis();
 			a.buildDataWithPredictions();
 			a.evaluatePredictionsNumeric();
-
+			
+			a.changeClassesInAttributes("diagnosis_discret.arff");
+			a.changeClassesInAttributes("diagnosis_discret_real.arff");
+			a.changeClassesInAttributes("PredictionData.arff");
+			
+			
 			//			startClassification = System.currentTimeMillis();
 			//			
 //						a.ClassifyData(new NaiveBayes());
@@ -94,49 +103,81 @@ public class Approach1 {
 		}
 
 	}
-
-	public void readClasses() throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
-		String[] split = in.readLine().split(",",-1);
-		in.close();
-		DecimalFormat df = new DecimalFormat("#.##");
-		for(int var = 0; var < split.length-3 ; var++){
-			float min = CreateDataDiscret.mins[var];
-			String s = "{";
-			int c=0;
-			for(;c<CreateDataDiscret.buckets-1;c++){
-				String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
-				d = d.replace(",",".");
-				s += d + ",";
-			}	
-			String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
-			d = d.replace(",",".");
-			s += d + "}";
-			classes.put(split[var+2], s );
-		}
-	}
-	private void changeClassesInAttributes(String file,String outFile) throws IOException{
+	
+	private void changeClassesInAttributes(String file) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(path + file));
-		BufferedWriter out = new BufferedWriter(new FileWriter(path + outFile));
+		BufferedWriter out = new BufferedWriter(new FileWriter(path + file+"tmp"));
 		String line;
 		for(int i=0;i<4;i++){
 			out.write(in.readLine()+ '\n');
 		}
+		
+		String class_att = "@attribute RecommendedRate {";
+		for (int i = 0; i < final_class.length; i++) {
+			class_att += final_class[i]+",";
+		}
+		class_att = class_att.substring(0,class_att.length()-1);
+		class_att += "}";
+//		System.out.println(class_att);
 		while((line = in.readLine()) != null){
-			if (line.contains("@attribute")){
-				if(line.contains("@attribute ALSFRS-RTotal")){
-					out.write("@attribute ALSFRS-RTotal {'{36-48}','{24-36}','{12-24}','{0-12}'}\n");
-				}else{
-					String feat = line.split(" ")[1];
-					out.write("@attribute "+ feat + " " + classes.get(feat) + '\n');
-				}
+				if(line.contains("@attribute RecommendedRate")){
+					out.write(class_att+"\n");
 			}else{
 				out.write(line+ '\n');
 			}
 		}
 		in.close();
 		out.close();
+		File source = new File(path + file+"tmp");
+		File dest = new File(path + file);
+		dest.delete();
+		Files.copy(source.toPath(),dest.toPath());
+		source.delete();
 	}
+
+//	public void readClasses() throws IOException {
+//		BufferedReader in = new BufferedReader(new FileReader(path + "diagnosis_discret.csv"));
+//		String[] split = in.readLine().split(",",-1);
+//		in.close();
+//		DecimalFormat df = new DecimalFormat("#.##");
+//		for(int var = 0; var < split.length-3 ; var++){
+//			float min = CreateDataDiscret.mins[var];
+//			String s = "{";
+//			int c=0;
+//			for(;c<CreateDataDiscret.buckets-1;c++){
+//				String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
+//				d = d.replace(",",".");
+//				s += d + ",";
+//			}	
+//			String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
+//			d = d.replace(",",".");
+//			s += d + "}";
+//			classes.put(split[var+2], s );
+//		}
+//	}
+	
+//	private void changeClassesInAttributes(String file,String outFile) throws IOException{
+//		BufferedReader in = new BufferedReader(new FileReader(path + file));
+//		BufferedWriter out = new BufferedWriter(new FileWriter(path + outFile));
+//		String line;
+//		for(int i=0;i<4;i++){
+//			out.write(in.readLine()+ '\n');
+//		}
+//		while((line = in.readLine()) != null){
+//			if (line.contains("@attribute")){
+//				if(line.contains("@attribute ALSFRS-RTotal")){
+//					out.write("@attribute ALSFRS-RTotal {'{36-48}','{24-36}','{12-24}','{0-12}'}\n");
+//				}else{
+//					String feat = line.split(" ")[1];
+//					out.write("@attribute "+ feat + " " + classes.get(feat) + '\n');
+//				}
+//			}else{
+//				out.write(line+ '\n');
+//			}
+//		}
+//		in.close();
+//		out.close();
+//	}
 
 
 
@@ -362,7 +403,7 @@ public class Approach1 {
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled.arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"diagnosis_discret_real.arff")));
 		HashMap<String,Integer> indexes = new HashMap<String, Integer>();
-		String[] classes ={"[0]","[1]","[2]","[3]","[4]"}; 
+		String[] classes = final_class; 
 		int u=0;
 		for(String c:classes){
 			indexes.put(c,u);
@@ -421,13 +462,9 @@ public class Approach1 {
 
 	private  void ClassifyData(Classifier classifier) throws Exception {
 		System.out.println("Classify Data");
-		//		changeClassesInAttributes("DiagnoseData.arff","DiagnoseDataNominal.arff");
-		//		changeClassesInAttributes("PredictionDataWithDemo"+steps+".arff","PredictionDataWithDemoNominal"+steps+".arff");
 		Instances train = new Instances(new BufferedReader(new FileReader(path+"diagnosis_discret.arff")));
-		//		CSVLoader loader = new CSVLoader();
-		//		loader.setSource(new File(path+"PredictionDataWithDemo.csv"));
-		//		Instances test = loader.getDataSet();
-		Instances test = new Instances(new BufferedReader(new FileReader(path+"PredictionData"+steps+".arff")));
+		// para sum Class  Instances test = new Instances(new BufferedReader(new FileReader(path+"PredictionData"+steps+".arff")));
+		Instances test = new Instances(new BufferedReader(new FileReader(path+"PredictionData.arff")));
 
 		// Set class index
 		train.setClassIndex(train.numAttributes() - 1);
@@ -506,7 +543,7 @@ public class Approach1 {
 		outDemo.close();
 		CreateData create = new CreateData();
 		create.CSV2arff(path,"PredictionData");
-		ChangeClassPreditions();
+//		ChangeClassPreditions();
 	}
 
 	//	private  void buildDataWithPredictionsNominal() throws IOException {
@@ -577,30 +614,30 @@ public class Approach1 {
 	//		ChangeClassPreditions();
 	//	}
 
-	private  void ChangeClassPreditions() {
-		System.out.println("changing class");
-		//TODO
-		try {
-			BufferedReader data = new BufferedReader(new FileReader(path +"PredictionData.arff"));
-			BufferedWriter out = new BufferedWriter(new FileWriter(path + "PredictionData"+steps+".arff"));
-			String line;
-			while((line = data.readLine()) != null){
-				if(line.contains("@attribute PowerClass string")){
-					// o numero de classes pode variar
-					out.write("@attribute PowerClass {[0],[1],[2],[3],[4]}\n");
-				}
-				else{
-					out.write(line+ '\n');
-				}
-			}
-			data.close();
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+//	private  void ChangeClassPreditionsSumClass() {
+//		System.out.println("changing class");
+//		//TODO
+//		try {
+//			BufferedReader data = new BufferedReader(new FileReader(path +"PredictionData.arff"));
+//			BufferedWriter out = new BufferedWriter(new FileWriter(path + "PredictionData"+steps+".arff"));
+//			String line;
+//			while((line = data.readLine()) != null){
+//				if(line.contains("@attribute PowerClass string")){
+//					// o numero de classes pode variar
+//					out.write("@attribute PowerClass {[0],[1],[2],[3],[4]}\n");
+//				}
+//				else{
+//					out.write(line+ '\n');
+//				}
+//			}
+//			data.close();
+//			out.close();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private  void predictExams(Classifier c) throws IOException {
 		String[] exams = getVariables();
