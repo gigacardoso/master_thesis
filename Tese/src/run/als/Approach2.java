@@ -36,7 +36,7 @@ public class Approach2 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> demoAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 3;
+	private  int steps = 6;
 	private  int folds = 10;
 
 	long[] vitalsTime = new long[6];
@@ -46,54 +46,100 @@ public class Approach2 {
 	public static void main(String[] args){
 
 		try {
-			Approach2 a = new Approach2();
-			start = System.currentTimeMillis();
-			//System.out.println("start: " + start);
-			
-			vitals = System.currentTimeMillis();
-//			a.predictVitals(new LinearRegression());
-			a.predictVitalsNominal(new J48());
-			SVC = System.currentTimeMillis();
-//			a.predictSVC(new LinearRegression());
-//			a.predictDemo(new LinearRegression());
-			a.predictSVCNominal(new J48());
-			a.predictDemoNominal(new J48());
-			predictions = System.currentTimeMillis();
-			//a.buildDataWithPredictions();
-			a.buildDataWithPredictionsNominal();
-			//a.readClasses();
-			//a.evaluatePredictions();
-			a.evaluatePredictionsNominal();
-			startClassification = System.currentTimeMillis();
-			a.ClassifyData(new NaiveBayes());
-			endNaive = System.currentTimeMillis();
-			a.buildConfussionMatrix("Naive Bayes");
-			a.ClassifyData(new RandomForest());
-			endRF = System.currentTimeMillis();
-			a.buildConfussionMatrix("RandomForest");
-			a.ClassifyData(new J48());
-			endDT = System.currentTimeMillis();
-			a.buildConfussionMatrix("J48");
-			a.ClassifyData(new AdaBoostM1());
-			endAdaboost = System.currentTimeMillis();
-			a.buildConfussionMatrix("AdaBoost");
-			//			a.ClassifyData(new MultilayerPerceptron());
-			//			a.buildConfussionMatrix("NN");
-			a.ClassifyData(new Logistic());
-			endLogistic = System.currentTimeMillis();
-			a.buildConfussionMatrix("Logistic");
-			
-			a.writeTimes();
-			System.out.println("------------------\tDiagnostic\t------------------");
-			//						a.ClassifyDiagnostic(new NaiveBayes());
-			//			a.ClassifyDiagnostic(new J48());
-			//			a.ClassifyDiagnostic(new AdaBoostM1());
-			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
-			//			a.ClassifyDiagnostic(new Logistic());
+			numeric();
+			//nominal();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void numeric() throws Exception {
+		Approach2 a = new Approach2();
+		start = System.currentTimeMillis();
+		//System.out.println("start: " + start);
+		
+		vitals = System.currentTimeMillis();
+			a.predictVitals(new LinearRegression());
+		SVC = System.currentTimeMillis();
+			a.predictSVC(new LinearRegression());
+		predictions = System.currentTimeMillis();
+		a.buildDataWithPredictions();
+		//a.readClasses();
+		a.evaluatePredictions();
+//		startClassification = System.currentTimeMillis();
+//		a.ClassifyData(new NaiveBayes());
+//		endNaive = System.currentTimeMillis();
+//		a.buildConfussionMatrix("Naive Bayes");
+//		a.ClassifyData(new RandomForest());
+//		endRF = System.currentTimeMillis();
+//		a.buildConfussionMatrix("RandomForest");
+//		a.ClassifyData(new J48());
+//		endDT = System.currentTimeMillis();
+//		a.buildConfussionMatrix("J48");
+//		a.ClassifyData(new AdaBoostM1());
+//		endAdaboost = System.currentTimeMillis();
+//		a.buildConfussionMatrix("AdaBoost");
+
+//		a.ClassifyData(new Logistic());
+//		endLogistic = System.currentTimeMillis();
+//		a.buildConfussionMatrix("Logistic");
+		
+		a.writeTimes();
+		System.out.println("------------------\tDiagnostic\t------------------");
+		//						a.ClassifyDiagnostic(new NaiveBayes());
+		//			a.ClassifyDiagnostic(new J48());
+		//			a.ClassifyDiagnostic(new AdaBoostM1());
+		//			a.ClassifyDiagnostic(new MultilayerPerceptron());
+		//			a.ClassifyDiagnostic(new Logistic());
+	}
+
+	private static void nominal() throws IOException, Exception,
+			FileNotFoundException {
+		Approach2 a = new Approach2();
+		start = System.currentTimeMillis();
+		//System.out.println("start: " + start);
+		
+		vitals = System.currentTimeMillis();
+//			a.predictVitals(new LinearRegression());
+		a.predictVitalsNominal(new J48());
+		SVC = System.currentTimeMillis();
+//			a.predictSVC(new LinearRegression());
+//			a.predictDemo(new LinearRegression());
+		a.predictSVCNominal(new J48());
+		a.predictDemoNominal(new J48());
+		predictions = System.currentTimeMillis();
+		//a.buildDataWithPredictions();
+		a.buildDataWithPredictionsNominal();
+		//a.readClasses();
+		//a.evaluatePredictions();
+		a.evaluatePredictionsNominal();
+		startClassification = System.currentTimeMillis();
+		a.ClassifyData(new NaiveBayes());
+		endNaive = System.currentTimeMillis();
+		a.buildConfussionMatrix("Naive Bayes");
+		a.ClassifyData(new RandomForest());
+		endRF = System.currentTimeMillis();
+		a.buildConfussionMatrix("RandomForest");
+		a.ClassifyData(new J48());
+		endDT = System.currentTimeMillis();
+		a.buildConfussionMatrix("J48");
+		a.ClassifyData(new AdaBoostM1());
+		endAdaboost = System.currentTimeMillis();
+		a.buildConfussionMatrix("AdaBoost");
+		//			a.ClassifyData(new MultilayerPerceptron());
+		//			a.buildConfussionMatrix("NN");
+		a.ClassifyData(new Logistic());
+		endLogistic = System.currentTimeMillis();
+		a.buildConfussionMatrix("Logistic");
+		
+		a.writeTimes();
+		System.out.println("------------------\tDiagnostic\t------------------");
+		//						a.ClassifyDiagnostic(new NaiveBayes());
+		//			a.ClassifyDiagnostic(new J48());
+		//			a.ClassifyDiagnostic(new AdaBoostM1());
+		//			a.ClassifyDiagnostic(new MultilayerPerceptron());
+		//			a.ClassifyDiagnostic(new Logistic());
 	}
 
 	private void evaluatePredictionsNominal() throws IOException {

@@ -45,11 +45,11 @@ public class CreateDataDiscret {
 			create.diagnosticData2();//DONE
 //
 //
-//			create.baseLineWithoutClass();//DONE
-//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-//			create.alternativeApproach(steps);
-//			aa.createDataNoClass(steps);//DONE
-//
+			create.baseLineWithoutClass();//DONE
+			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
+			create.alternativeApproach(steps);
+			aa.createDataNoClass(steps);//DONE
+
 //			create.approach1(steps);
 //			Approach1CreateDataDiscret a1 = new Approach1CreateDataDiscret(approach1Output, steps); //DONE
 //			a1.createDataSVC(steps);
@@ -61,7 +61,7 @@ public class CreateDataDiscret {
 
 
 			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
-			move.MoveAllData(steps);
+			move.MoveAllData(steps, true);
 //			create.CleanData();
 
 			//			aa.createData(steps);

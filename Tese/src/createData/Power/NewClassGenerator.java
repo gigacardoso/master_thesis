@@ -193,11 +193,15 @@ public class NewClassGenerator {
 				}
 			}else{
 				String averages = "";
-				for (int i = 0; i < sums.size()-6; i++) {
+				//TODO
+//				for (int i = 0; i < sums.size()-6; i++) {
+//					averages += (sums.get(i)/sumed) +",";
+//				}
+//				for (int i = sums.size()-6; i < sums.size(); i++) {
+//					averages += (sums.get(i)) +",";
+//				}
+				for (int i = 0; i < sums.size(); i++) {
 					averages += (sums.get(i)/sumed) +",";
-				}
-				for (int i = sums.size()-6; i < sums.size(); i++) {
-					averages += (sums.get(i)) +",";
 				}
 				averages = averages.substring(0,averages.length()-1);
 				output = day + ","+ averages;

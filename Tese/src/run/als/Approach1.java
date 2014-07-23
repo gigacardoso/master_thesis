@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import utils.DefaultHashMap;
+import utils.Utils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -36,19 +37,17 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> demoAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 	private HashMap<String, String> classes = new HashMap<String, String>();
-	private  int steps = 3;
+	private static  int steps = 6;
 	private  int folds = 10;
+	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
 	long[] vitalsTime = new long[6];
 	long[] svcTime = new long[4];
 	long[] demoTime = new long[3];
 	static long start,vitals,SVC,predictions,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
-
-
-
 		try {
-			nominal();
+			//nominal();
 			numeric();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -57,6 +56,8 @@ public class Approach1 {
 	}
 
 	private static void numeric() throws Exception {
+		System.out.println("Steps - " + steps);
+		
 		Approach1 a = new Approach1();
 
 		a.svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
@@ -74,20 +75,22 @@ public class Approach1 {
 		a.evaluatePredictionsNumeric();
 		startClassification = System.currentTimeMillis();
 		a.ClassifyData(new NaiveBayes());
-		endNaive = System.currentTimeMillis();
-		a.buildConfussionMatrix("Naive Bayes");
-		a.ClassifyData(new RandomForest());
-		endRF = System.currentTimeMillis();
-		a.buildConfussionMatrix("RandomForest");
-		a.ClassifyData(new J48());
-		endDT = System.currentTimeMillis();
-		a.buildConfussionMatrix("J48");
-		a.ClassifyData(new AdaBoostM1());
-		endAdaboost = System.currentTimeMillis();
-		a.buildConfussionMatrix("AdaBoost");
-		a.ClassifyData(new Logistic());
-		endLogistic = System.currentTimeMillis();
-		a.buildConfussionMatrix("Logistic");
+//		endNaive = System.currentTimeMillis();
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes");
+		Utils u = new Utils();
+		u.metrics(matrix,classes_simb);
+//		a.ClassifyData(new RandomForest());
+//		endRF = System.currentTimeMillis();
+//		a.buildConfussionMatrix("RandomForest");
+//		a.ClassifyData(new J48());
+//		endDT = System.currentTimeMillis();
+//		a.buildConfussionMatrix("J48");
+//		a.ClassifyData(new AdaBoostM1());
+//		endAdaboost = System.currentTimeMillis();
+//		a.buildConfussionMatrix("AdaBoost");
+//		a.ClassifyData(new Logistic());
+//		endLogistic = System.currentTimeMillis();
+//		a.buildConfussionMatrix("Logistic");
 
 		a.writeTimes();
 		System.out.println("------------------\tDiagnostic\t------------------");
@@ -117,19 +120,19 @@ public class Approach1 {
 		a.buildDataWithPredictionsNominal();
 		a.evaluatePredictionsNominal();
 		startClassification = System.currentTimeMillis();
-		a.ClassifyData(new NaiveBayes());
+		a.ClassifyDataNominal(new NaiveBayes());
 		endNaive = System.currentTimeMillis();
 		a.buildConfussionMatrix("Naive Bayes");
-		a.ClassifyData(new RandomForest());
+		a.ClassifyDataNominal(new RandomForest());
 		endRF = System.currentTimeMillis();
 		a.buildConfussionMatrix("RandomForest");
-		a.ClassifyData(new J48());
+		a.ClassifyDataNominal(new J48());
 		endDT = System.currentTimeMillis();
 		a.buildConfussionMatrix("J48");
-		a.ClassifyData(new AdaBoostM1());
+		a.ClassifyDataNominal(new AdaBoostM1());
 		endAdaboost = System.currentTimeMillis();
 		a.buildConfussionMatrix("AdaBoost");
-		a.ClassifyData(new Logistic());
+		a.ClassifyDataNominal(new Logistic());
 		endLogistic = System.currentTimeMillis();
 		a.buildConfussionMatrix("Logistic");
 
@@ -493,7 +496,7 @@ public class Approach1 {
 		}
 	}
 
-	private  void buildConfussionMatrix(String method) throws FileNotFoundException, IOException {
+	private  int[][] buildConfussionMatrix(String method) throws FileNotFoundException, IOException {
 		System.out.println("build Confusion Matrix");
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled.arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"DiagnoseDataReal.arff")));
@@ -547,9 +550,11 @@ public class Approach1 {
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
+		
+		return matrix;
 	}
 
-	private  void ClassifyData(Classifier classifier) throws Exception {
+	private  void ClassifyDataNominal(Classifier classifier) throws Exception {
 		System.out.println("Classify Data");
 		changeClassesInAttributes("DiagnoseData.arff","DiagnoseDataNominal.arff");
 		changeClassesInAttributes("PredictionDataWithDemo"+steps+".arff","PredictionDataWithDemoNominal"+steps+".arff");
@@ -558,6 +563,63 @@ public class Approach1 {
 		//		loader.setSource(new File(path+"PredictionDataWithDemo.csv"));
 		//		Instances test = loader.getDataSet();
 		Instances test = new Instances(new BufferedReader(new FileReader(path+"PredictionDataWithDemoNominal"+steps+".arff")));
+
+		// Set class index
+		train.setClassIndex(train.numAttributes() - 1);
+		test.setClassIndex(test.numAttributes() - 1);
+
+		Instances labeled = new Instances(test);
+
+		Remove remove = new Remove();                         // new instance of filter
+		remove.setAttributeIndices("1");					// set options
+		// Create Classifier
+		FilteredClassifier cModel = new FilteredClassifier();
+		cModel.setFilter(remove);
+		cModel.setClassifier(classifier);
+		// train and make predictions
+		cModel.buildClassifier(train);
+
+		//		System.out.println("----------------------------------------");
+		//		System.out.println(cModel.toString());
+
+		// Test the model
+		//		Evaluation eTest = new Evaluation(test);
+		//		eTest.evaluateModel(cModel, test);
+
+		// Print the result à la Weka explorer:
+		//		String strSummary = eTest.toSummaryString();
+		//		System.out.println(cModel.toString());
+		//		System.out.println(strSummary);
+		//		System.out.println("--------------------------------");
+
+		for (int i = 0; i < test.numInstances(); i++) {
+			double clsLabel = cModel.classifyInstance(test.instance(i));
+			labeled.instance(i).setClassValue(clsLabel);
+		}
+
+		BufferedWriter writer = new BufferedWriter(
+				new FileWriter(path+"labeled.arff"));
+		writer.write(labeled.toString());
+		writer.newLine();
+		writer.flush();
+		writer.close();
+
+		//		for(Instance i:test){
+		//			System.out.print(i.toString());
+		//			Double d = cModel.classifyInstance(i);
+		//			System.out.println("\t-> "+d);
+		//		}
+	}
+	
+	private  void ClassifyData(Classifier classifier) throws Exception {
+		System.out.println("Classify Data");
+//		changeClassesInAttributes("DiagnoseData.arff","DiagnoseDataNominal.arff");
+//		changeClassesInAttributes("PredictionDataWithDemo"+steps+".arff","PredictionDataWithDemoNominal"+steps+".arff");
+		Instances train = new Instances(new BufferedReader(new FileReader(path+"DiagnoseData.arff")));
+		//		CSVLoader loader = new CSVLoader();
+		//		loader.setSource(new File(path+"PredictionDataWithDemo.csv"));
+		//		Instances test = loader.getDataSet();
+		Instances test = new Instances(new BufferedReader(new FileReader(path+"PredictionDataWithDemo"+steps+".arff")));
 
 		// Set class index
 		train.setClassIndex(train.numAttributes() - 1);

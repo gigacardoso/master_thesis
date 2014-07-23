@@ -35,8 +35,6 @@ public class Discretize {
 		String[] head = header.split(",",-1);
 		String line;
 
-		ArrayList<Float> max = new ArrayList<Float>();
-		ArrayList<Float> min = new ArrayList<Float>();
 		ArrayList<HashMap<Integer,Integer>> counts = new ArrayList<HashMap<Integer,Integer>>();
 		for(int i=2; i < head.length-1 ; i++){
 			HashMap<Integer, Integer> tree = new HashMap<Integer, Integer>();
@@ -44,8 +42,6 @@ public class Discretize {
 				tree.put(j, 0);
 			}
 			counts.add(tree);
-			max.add(Float.MIN_VALUE);
-			min.add(Float.MAX_VALUE);
 		}
 
 		while ((line = in.readLine()) != null) {
