@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import utils.DefaultHashMap;
+import utils.Utils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -36,8 +37,11 @@ public class Approach2 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> demoAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private  int steps = 6;
+	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
+	
+	private static int steps = 5;
 	private  int folds = 10;
+	
 
 	long[] vitalsTime = new long[6];
 	long[] svcTime = new long[4];
@@ -58,7 +62,7 @@ public class Approach2 {
 		Approach2 a = new Approach2();
 		start = System.currentTimeMillis();
 		//System.out.println("start: " + start);
-		
+		LinearRegression j = new LinearRegression();
 		vitals = System.currentTimeMillis();
 			a.predictVitals(new LinearRegression());
 		SVC = System.currentTimeMillis();
@@ -67,23 +71,29 @@ public class Approach2 {
 		a.buildDataWithPredictions();
 		//a.readClasses();
 		a.evaluatePredictions();
-//		startClassification = System.currentTimeMillis();
-//		a.ClassifyData(new NaiveBayes());
+		
+		startClassification = System.currentTimeMillis();
+		a.ClassifyData(new NaiveBayes());
 //		endNaive = System.currentTimeMillis();
-//		a.buildConfussionMatrix("Naive Bayes");
-//		a.ClassifyData(new RandomForest());
-//		endRF = System.currentTimeMillis();
-//		a.buildConfussionMatrix("RandomForest");
-//		a.ClassifyData(new J48());
-//		endDT = System.currentTimeMillis();
-//		a.buildConfussionMatrix("J48");
-//		a.ClassifyData(new AdaBoostM1());
-//		endAdaboost = System.currentTimeMillis();
-//		a.buildConfussionMatrix("AdaBoost");
-
-//		a.ClassifyData(new Logistic());
-//		endLogistic = System.currentTimeMillis();
-//		a.buildConfussionMatrix("Logistic");
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes");
+		Utils u = new Utils();
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2", steps, "NaiveBayes");
+		a.ClassifyData(new RandomForest());
+		endRF = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("RandomForest");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2", steps, "RandomForest");
+		a.ClassifyData(new J48());
+		endDT = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("J48");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2", steps, "J48");
+		a.ClassifyData(new Logistic());
+		endLogistic = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2", steps, "Logistic");
+		a.ClassifyData(new AdaBoostM1());
+		endAdaboost = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("AdaBoost");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2", steps, "AdaBoost");
 		
 		a.writeTimes();
 		System.out.println("------------------\tDiagnostic\t------------------");
@@ -379,7 +389,7 @@ public class Approach2 {
 		}
 	}
 
-	private  void buildConfussionMatrix(String method) throws FileNotFoundException, IOException {
+	private  int[][] buildConfussionMatrix(String method) throws FileNotFoundException, IOException {
 		System.out.println("build Confusion Matrix");
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled.arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"DiagnoseDataReal.arff")));
@@ -433,7 +443,7 @@ public class Approach2 {
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
-
+		return matrix;
 	}
 
 	private  void ClassifyData(Classifier classifier) throws Exception {

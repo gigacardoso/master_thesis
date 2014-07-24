@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 
 import utils.DefaultHashMap;
+import utils.Utils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -34,13 +35,14 @@ public class Approach2 {
 	private String times = path + "times\\";
 	private String andreia = data + "andreia\\";
 	private String hmm = path + "predictionsHMM_Multi\\";
+	private static String[] classes_simb = {"F0","F1","F2","F3","F4"};
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 3;
+	private static int steps = 12;
 	private  int folds = 10;
 
 	long[] examsTime = new long[exams.length];
@@ -89,28 +91,29 @@ public class Approach2 {
 		predictionsTime = System.currentTimeMillis();
 		//a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
-		//			a.buildDataWithPredictionsUnsorted();
 		startClassification = System.currentTimeMillis();
-		//a.ClassifyData(new NaiveBayes(), "");
+		a.ClassifyData(new NaiveBayes(), "");
 		endNaive = System.currentTimeMillis();
-		//a.buildConfussionMatrix("Naive Bayes", "");
+		Utils u = new Utils();
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "NaiveBayes");
 		a.ClassifyData(new RandomForest(), "");
 		endRF = System.currentTimeMillis();
-		a.buildConfussionMatrix("RandomForest", "");
-		//a.ClassifyData(new J48(), "");
+		matrix = a.buildConfussionMatrix("RandomForest", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "RandomForest");
+		a.ClassifyData(new J48(), "");
 		endDT = System.currentTimeMillis();
-		//a.buildConfussionMatrix("J48","");
-		//			a.ClassifyData(new J48(), "Unsorted");
-		//			a.buildConfussionMatrix("J48","Unsorted");
-		//			a.compareLabeled();
-		//a.ClassifyData(new AdaBoostM1(), "");
-		endAdaboost = System.currentTimeMillis();
-		//a.buildConfussionMatrix("AdaBoost","");
-		//			a.ClassifyData(new MultilayerPerceptron());
-		//			a.buildConfussionMatrix("NN");
-		//a.ClassifyData(new Logistic(), "");
+		matrix = a.buildConfussionMatrix("J48","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "J48");
+		a.ClassifyData(new Logistic(), "");
 		endLogistic = System.currentTimeMillis();
-		//a.buildConfussionMatrix("Logistic", "");
+		matrix = a.buildConfussionMatrix("Logistic", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "Logistic");
+		a.ClassifyData(new AdaBoostM1(), "");
+		endAdaboost = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("AdaBoost","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "AdaBoost");
+		
 		//a.writeTimes(j);
 	}
 
@@ -323,7 +326,7 @@ public class Approach2 {
 		}
 	}
 
-	private  void buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
+	private  int[][] buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
 		System.out.println("build Confusion Matrix " + string);
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled"+string+".arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"DiagnosisReal.arff")));
@@ -386,7 +389,7 @@ public class Approach2 {
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
-
+		return matrix;
 	}
 
 	private  void ClassifyData(Classifier classifier, String string) throws Exception {

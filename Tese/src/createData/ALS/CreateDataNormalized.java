@@ -30,7 +30,7 @@ public class CreateDataNormalized {
 	public static void main(String[] args) {
 		CreateDataNormalized create = new CreateDataNormalized();
 		try {
-			steps = 6;
+			steps = 5;
 			create.diagnosticDataNotNormalized();//DONE
 			create.findMinMax();
 			create.diagnosticData();//DONE

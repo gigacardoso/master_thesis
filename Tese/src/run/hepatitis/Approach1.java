@@ -14,6 +14,7 @@ import java.util.Random;
 import java.util.Set;
 
 import utils.DefaultHashMap;
+import utils.Utils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -33,6 +34,7 @@ public class Approach1 {
 	private String times = path + "times\\";
 	private String andreia = data + "andreia\\";
 	private String hmm = path + "predictionsHMM\\";
+	private static String[] classes_simb = {"F0","F1","F2","F3","F4"};
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
@@ -41,11 +43,12 @@ public class Approach1 {
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
-	private  int steps = 3;
+	private static int steps = 12;
 	private  int folds = 10;
 
 	long[] examsTime = new long[exams.length];
 	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
+
 	public static void main(String[] args){
 		try {
 			//hmm();
@@ -95,33 +98,35 @@ public class Approach1 {
 	FileNotFoundException {
 		Approach1 a = new Approach1();
 		start = System.currentTimeMillis();
-		Logistic j = new Logistic();
+		J48 j = new J48();
 		a.predictExams(j);
 		predictionsTime = System.currentTimeMillis();
 		//a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
 		startClassification = System.currentTimeMillis();
-		//a.ClassifyData(new NaiveBayes(), "");
+		a.ClassifyData(new NaiveBayes(), "");
 		endNaive = System.currentTimeMillis();
-		//a.buildConfussionMatrix("Naive Bayes", "");
+		Utils u = new Utils();
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "NaiveBayes");
 		a.ClassifyData(new RandomForest(), "");
 		endRF = System.currentTimeMillis();
-		a.buildConfussionMatrix("RandomForest", "");
-		//a.ClassifyData(new J48(), "");
+		matrix = a.buildConfussionMatrix("RandomForest", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "RandomForest");
+		a.ClassifyData(new J48(), "");
 		endDT = System.currentTimeMillis();
-		//a.buildConfussionMatrix("J48","");
-		//			a.ClassifyData(new J48(), "Unsorted");
-		//			a.buildConfussionMatrix("J48","Unsorted");
-		//			a.compareLabeled();
-		//a.ClassifyData(new AdaBoostM1(), "");
-		endAdaboost = System.currentTimeMillis();
-				//a.buildConfussionMatrix("AdaBoost","");
-		//			a.ClassifyData(new MultilayerPerceptron());
-		//			a.buildConfussionMatrix("NN");
-		//a.ClassifyData(new Logistic(), "");
+		matrix = a.buildConfussionMatrix("J48","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "J48");
+		a.ClassifyData(new Logistic(), "");
 		endLogistic = System.currentTimeMillis();
-		//a.buildConfussionMatrix("Logistic", "");
+		matrix = a.buildConfussionMatrix("Logistic", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "Logistic");
+		a.ClassifyData(new AdaBoostM1(), "");
+		endAdaboost = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("AdaBoost","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "AdaBoost");
+
 		//a.writeTimes(j);
 	}
 
@@ -339,7 +344,7 @@ public class Approach1 {
 		}
 	}
 
-	private  void buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
+	private  int[][] buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
 		System.out.println("build Confusion Matrix " + string);
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled"+string+".arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"DiagnosisReal.arff")));
@@ -403,6 +408,7 @@ public class Approach1 {
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
 
+		return matrix;
 	}
 
 	private  void ClassifyData(Classifier classifier, String string) throws Exception {
@@ -432,13 +438,13 @@ public class Approach1 {
 		//		cModel.buildClassifier(train);
 
 		// Test the model
-//				Evaluation eTest = new Evaluation(test);
-//				eTest.evaluateModel(cModel, test);
+		//				Evaluation eTest = new Evaluation(test);
+		//				eTest.evaluateModel(cModel, test);
 
 		// Print the result à la Weka explorer:
-//				String strSummary = eTest.toSummaryString();
+		//				String strSummary = eTest.toSummaryString();
 		//		System.out.println(cModel.toString());
-//				System.out.println(strSummary);
+		//				System.out.println(strSummary);
 		//		System.out.println("--------------------------------");
 
 		for (int i = 0; i < test.numInstances(); i++) {
@@ -448,12 +454,12 @@ public class Approach1 {
 			//			System.out.println("---------------");
 			labeled.instance(i).setClassValue(clsLabel);
 		}
-		
+
 		Evaluation eTest = new Evaluation(labeled);
 		eTest.evaluateModel(cModel, labeled);
 		System.out.println(eTest.toSummaryString());
-		
-		
+
+
 		BufferedWriter writer = new BufferedWriter(
 				new FileWriter(path+"labeled"+string+".arff"));
 		writer.write(labeled.toString());
@@ -723,7 +729,7 @@ public class Approach1 {
 					predictions.put(exams[i], exam);
 					//					System.out.println("Sleeping - ZzZZZZZZzzZZZZ");
 					//					Thread.sleep(1000);
-					
+
 				}
 				examsTime[i] = System.currentTimeMillis();
 				out.close();
@@ -734,8 +740,8 @@ public class Approach1 {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	private HashMap<String, HashMap<Double, String>> getIndexes(String[] exams) throws IOException {
 		HashMap<String, HashMap<Double, String>> indexes = new HashMap<String, HashMap<Double,String>>();
 		for(String exam: exams){

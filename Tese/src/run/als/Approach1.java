@@ -37,7 +37,7 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> demoAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 	private HashMap<String, String> classes = new HashMap<String, String>();
-	private static  int steps = 6;
+	private static  int steps = 5;
 	private  int folds = 10;
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
@@ -67,6 +67,7 @@ public class Approach1 {
 		start = System.currentTimeMillis();
 		//System.out.println("start: " + start);
 		vitals = System.currentTimeMillis();
+		LinearRegression j = new LinearRegression();
 		a.predictVitals(new LinearRegression());
 		SVC = System.currentTimeMillis();
 		a.predictSVC(new LinearRegression());
@@ -78,19 +79,23 @@ public class Approach1 {
 //		endNaive = System.currentTimeMillis();
 		int[][] matrix = a.buildConfussionMatrix("Naive Bayes");
 		Utils u = new Utils();
-		u.metrics(matrix,classes_simb);
-//		a.ClassifyData(new RandomForest());
-//		endRF = System.currentTimeMillis();
-//		a.buildConfussionMatrix("RandomForest");
-//		a.ClassifyData(new J48());
-//		endDT = System.currentTimeMillis();
-//		a.buildConfussionMatrix("J48");
-//		a.ClassifyData(new AdaBoostM1());
-//		endAdaboost = System.currentTimeMillis();
-//		a.buildConfussionMatrix("AdaBoost");
-//		a.ClassifyData(new Logistic());
-//		endLogistic = System.currentTimeMillis();
-//		a.buildConfussionMatrix("Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "NaiveBayes");
+		a.ClassifyData(new RandomForest());
+		endRF = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("RandomForest");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "RandomForest");
+		a.ClassifyData(new J48());
+		endDT = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("J48");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "J48");
+		a.ClassifyData(new Logistic());
+		endLogistic = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "Logistic");
+		a.ClassifyData(new AdaBoostM1());
+		endAdaboost = System.currentTimeMillis();
+		matrix = a.buildConfussionMatrix("AdaBoost");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "AdaBoost");
 
 		a.writeTimes();
 		System.out.println("------------------\tDiagnostic\t------------------");

@@ -31,7 +31,7 @@ public class TableGeneratorCategories {
 	private DefaultHashMap<String, String> biopsys = new DefaultHashMap<String, String>("");
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private DefaultHashMap<String, String> headers = new DefaultHashMap<String, String>("");
-	public static int steps = 3;
+	public static int steps = 12;
 
 	private void examsPut(String s, int i){
 		examsIndexes.put(s, i);
