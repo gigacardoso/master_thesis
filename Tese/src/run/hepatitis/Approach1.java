@@ -48,11 +48,11 @@ public class Approach1 {
 
 	long[] examsTime = new long[exams.length];
 	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
-
+	static ArrayList<String> accuracies = new ArrayList<String>();
 	public static void main(String[] args){
 		try {
-			//hmm();
-			not_hmm();
+			hmm();
+//			not_hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//						a.ClassifyDiagnostic(new NaiveBayes());
@@ -76,22 +76,29 @@ public class Approach1 {
 		//a.buildDataWithPredictionsSorted();
 		a.buildDataWithHMMPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
+		Classifier j = null;
+		Utils u = new Utils();
+		accuracies = new ArrayList<String>();
 		//			a.buildDataWithHMMPredictionsUnsorted();
 		a.ClassifyData(new NaiveBayes(), "");
-		a.buildConfussionMatrix("Naive Bayes", "");
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "NaiveBayes");
 		a.ClassifyData(new J48(), "");
-		a.buildConfussionMatrix("J48","");
-		//			a.ClassifyData(new J48(), "Unsorted");
-		//			a.buildConfussionMatrix("J48","Unsorted");
-		//			a.compareLabeled();
+		matrix = a.buildConfussionMatrix("J48","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "J48");
 		a.ClassifyData(new AdaBoostM1(), "");
-		a.buildConfussionMatrix("AdaBoost","");
-		//			a.ClassifyData(new MultilayerPerceptron());
-		//			a.buildConfussionMatrix("NN");
+		matrix = a.buildConfussionMatrix("AdaBoost","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "AdaBoost");
 		a.ClassifyData(new Logistic(), "");
-		a.buildConfussionMatrix("Logistic", "");
+		matrix = a.buildConfussionMatrix("Logistic", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "Logistic");
 		a.ClassifyData(new RandomForest(), "");
-		a.buildConfussionMatrix("RandomForest", "");
+		matrix = a.buildConfussionMatrix("RandomForest", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "RandomForest");
+		
+		for (String s : accuracies) {
+			System.out.println(s);
+		}
 	}
 
 	private static void not_hmm() throws IOException, Exception,
@@ -406,6 +413,7 @@ public class Approach1 {
 		double errorRate = bad/fal;
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
+		accuracies.add(df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
 
 		return matrix;
@@ -686,7 +694,7 @@ public class Approach1 {
 		try{
 			for(int i= 0; i< exams.length;i++){
 				Instances data = new Instances(new BufferedReader(new FileReader(path+exams[i]/*+"_Multi"*/+".arff")));
-				BufferedWriter out = new BufferedWriter(new FileWriter(hmm+"_________"+exams[i]+"_Predictions.csv"));
+				//BufferedWriter out = new BufferedWriter(new FileWriter(hmm+"_________"+exams[i]+"_Predictions.csv"));
 
 				Random rand = new Random(1);   // create seeded number generator
 				Instances randData = new Instances(data);   // create copy of original data
@@ -723,7 +731,7 @@ public class Approach1 {
 						//						System.out.println("\t-> "+d);
 						String in = (ins.toString().split(","))[0];
 						exam.put(in , indexes.get(exams[i]).get(d));
-						out.write(in+ ","+indexes.get(exams[i]).get(d)+ "\n");
+						//out.write(in+ ","+indexes.get(exams[i]).get(d)+ "\n");
 					}
 					//System.out.println("saving "+ exams[i] + " exams \t" + exam);
 					predictions.put(exams[i], exam);
@@ -732,7 +740,7 @@ public class Approach1 {
 
 				}
 				examsTime[i] = System.currentTimeMillis();
-				out.close();
+				//out.close();
 			}
 
 		}

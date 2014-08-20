@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.functions.Logistic;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
@@ -40,17 +39,20 @@ public class Utils {
 
 	public void metrics(int[][] matrix, String[] classes,String ds, Classifier j, String approach, int steps, String algorithm) {
 		try {
-			String[] split = j.getClass().toString().split("\\.");
-			String classs = split[split.length-1];
+			String classs;
+			if(j != null){
+				String[] split = j.getClass().toString().split("\\.");
+				classs = split[split.length-1];
+			}
+			else{
+				classs = "HMM";
+			}
 			System.out.println(classs);
 			BufferedWriter out = new BufferedWriter(new FileWriter(path+ds+"_"+classs+"_"+approach+"_"+algorithm+"_"+steps+".csv"));
-			
+
 			out.write(ds+"\n");
 			out.write("Approach,Algorithm,Steps\n");
 			out.write(approach+","+algorithm+","+steps+ "\n\n");
-			if(algorithm.equals("AdaBoost")){
-				int i = 0;
-			}
 			int size = matrix.length;
 			double all = 0;
 			double right = 0;
@@ -66,7 +68,7 @@ public class Utils {
 			double accuracy = (right/all);
 			DecimalFormat df = new DecimalFormat("#.##");
 			out.write("Accuracy,"+df.format(accuracy*100).replace(",",".")+ "%\n\n");
-			
+
 			double TP=0, TN=0, FP=0, FN = 0;
 			for (int i = 0; i < classes.length; i++) {
 				out.write(classes[i]+"\n");

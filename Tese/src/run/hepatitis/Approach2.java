@@ -47,10 +47,11 @@ public class Approach2 {
 
 	long[] examsTime = new long[exams.length];
 	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
+	static ArrayList<String> accuracies = new ArrayList<String>();
 	public static void main(String[] args){
 		try {
-			//hmm();
-			not_hmm();
+			hmm();
+//			not_hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
 			//			a.ClassifyDiagnostic(new NaiveBayes());
@@ -70,16 +71,29 @@ public class Approach2 {
 		a.evaluatePredictionsHMM();
 		a.buildDataWithHMMPredictionsSorted();
 		//			a.buildDataWithPredictionsUnsorted();
+		Classifier j = null;
+		Utils u = new Utils();
+		accuracies  = new ArrayList<String>();
+		
 		a.ClassifyData(new NaiveBayes(), "");
-		a.buildConfussionMatrix("Naive Bayes", "");
+		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2(4,5)", steps, "NaiveBayes");
 		a.ClassifyData(new J48(), "");
-		a.buildConfussionMatrix("J48","");
+		matrix = a.buildConfussionMatrix("J48","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2(4,5)", steps, "J48");
 		a.ClassifyData(new AdaBoostM1(), "");
-		a.buildConfussionMatrix("AdaBoost","");
+		matrix = a.buildConfussionMatrix("AdaBoost","");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2(4,5)", steps, "AdaBoost");
 		a.ClassifyData(new Logistic(), "");
-		a.buildConfussionMatrix("Logistic", "");
+		matrix = a.buildConfussionMatrix("Logistic", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2(4,5)", steps, "Logistic");
 		a.ClassifyData(new RandomForest(), "");
-		a.buildConfussionMatrix("RandomForest", "");
+		matrix = a.buildConfussionMatrix("RandomForest", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2(4,5)", steps, "RandomForest");
+		
+		for (String s : accuracies) {
+			System.out.println(s);
+		}
 	}
 
 	private static void not_hmm() throws IOException, Exception,
@@ -388,6 +402,7 @@ public class Approach2 {
 		double errorRate = bad/fal;
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
+		accuracies.add(df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
 		return matrix;
 	}
