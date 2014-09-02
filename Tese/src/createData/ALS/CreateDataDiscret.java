@@ -23,38 +23,38 @@ public class CreateDataDiscret {
 	public static  String diagnosisOutput = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "DiagnosisData"+ File.separator;
 	private  HashMap<Integer,Boolean> _common = new HashMap<Integer, Boolean>();
 	public static  int steps;
-	
+
 	// 10 buckets
-//	public static Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
-//			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
-	
+	//	public static Float[] divider = {(float) 6.1,(float) 13.7, (float) 11.7, (float) 0.653,(float) 0.544,
+	//			(float) 0.549,(float) 7.9,(float) 12.6,(float) 9.9,(float) 5.1,(float) 9.86,(float) 22.830 };
+
 	// 6 buckets
 	public static Float[] divider = {(float)10.167,(float)22.833,(float)19.5,(float)1.088,(float)0.907,
 		(float)0.915,(float)13.167,(float)21,(float)16.5,(float)8.5,(float)16.433,(float)38.05};
-	
+
 	public static Float[] mins = {(float) 18,(float) 59,(float) 0,(float) 0,(float) 0.2,(float) 0,
 		(float) 40,	(float) 72,(float) 45,(float) 9,(float) 0,(float) 36.7};
 
 	public static int buckets = 6;	
-	
+
 	public static void main(String[] args) {
 		CreateDataDiscret create = new CreateDataDiscret();
 		try {
 			steps = 3;
 			create.diagnosticData();//DONE
 			create.diagnosticData2();//DONE
-//
-//
+			//
+			//
 			create.baseLineWithoutClass();//DONE
 			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
 			create.alternativeApproach(steps);
 			aa.createDataNoClass(steps);//DONE
 
-//			create.approach1(steps);
-//			Approach1CreateDataDiscret a1 = new Approach1CreateDataDiscret(approach1Output, steps); //DONE
-//			a1.createDataSVC(steps);
-//			a1.createDataVitals(steps);
-//			a1.createDataDemo(steps);
+			create.approach1(steps);
+			Approach1CreateDataDiscret a1 = new Approach1CreateDataDiscret(approach1Output, steps); //DONE
+			a1.createDataSVC(steps);
+			a1.createDataVitals(steps);
+			a1.createDataDemo(steps);
 
 			Approach2CreateData a2 = new Approach2CreateData(approach1Output,diagnosisOutput,steps); 
 			a2.createData(steps);//DONE
@@ -62,7 +62,7 @@ public class CreateDataDiscret {
 
 			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
 			move.MoveAllData(steps, true);
-//			create.CleanData();
+			//			create.CleanData();
 
 			//			aa.createData(steps);
 			//			create.baseLineWithClass();
@@ -225,7 +225,7 @@ public class CreateDataDiscret {
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
+														patient += discretize(0,split4[4]) + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
 														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6]) + "," + discretize(6,split[7])+",";
 														split3 = lines3.get(((lines3.size()-steps)+i)).split(",",-1);
@@ -239,7 +239,7 @@ public class CreateDataDiscret {
 													}
 
 													patient = last+ ",";
-													patient += split4[4] + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
+													patient += discretize(0,split4[4]) + "," + discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 
 													split = line1.split(",",-1);
 													patient += discretize(3,split[2].replace(' ', '_').replace('%', 'P')) + "," + discretize(4,split[5].replace(' ', '_'))+ "," +
@@ -383,7 +383,7 @@ public class CreateDataDiscret {
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
+														patient += discretize(0,split4[4]) + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-len)+i)).split(",",-1);
 														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6])
 																+ "," + discretize(6,split[7])+",";
@@ -683,7 +683,7 @@ public class CreateDataDiscret {
 														splitHeight = lines3.get(0).split(",",-1);
 														split4 = lines4.get((lines4.size()-1)).split(",",-1);
 														patient = last+ ",";
-														patient += split4[4] + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
+														patient += discretize(0,split4[4]) + "," +  discretize(1,split4[11]) + ","+ discretize(2,splitHeight[4]) + ",";
 														split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
 														patient += discretize(3,split[2]) + "," + discretize(4,split[5]) + "," + discretize(5,split[6])
 																+ "," + discretize(6,split[7])+",";
@@ -740,6 +740,48 @@ public class CreateDataDiscret {
 		}
 	}	
 
+	/* discretize with bucket edges 0-0.75 */
+	//	public String discretize(int var ,String string) {
+	//		var--;
+	//		if(var ==12){ 
+	//			int i;
+	//			try{
+	//				i = Integer.parseInt(string);
+	//			}catch(Exception e) {
+	//				return "";
+	//			}
+	//			if(i<=10){
+	//				return "{0-12}";
+	//			}else {
+	//				if(i<=20){
+	//					return "{12-24}";
+	//				}else{
+	//					if(i<30){
+	//						return "{24-36}";
+	//					}else {
+	//						return "{36-48}";
+	//					}
+	//				}
+	//			}
+	//		}else{
+	//			if(string.length()>0){
+	//				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
+	//				if(c==buckets){
+	//					c=buckets-1;
+	//				}
+	//				DecimalFormat df = new DecimalFormat("#.##");
+	//				float min = mins[var];
+	//				
+	//				String s = df.format(min+(c*divider[var]))+ "-" + df.format(min+((c+1)*divider[var]));
+	//				s = s.replace(",",".");
+	//				return s;
+	//			}else{
+	//				return "missing"; //string;
+	//			}
+	//		}
+	//	}
+
+	/* discretize with N buckets and  NO var :  var-1, var-2 */
 	public String discretize(int var ,String string) {
 		var--;
 		if(var ==12){ 
@@ -763,22 +805,70 @@ public class CreateDataDiscret {
 				}
 			}
 		}else{
-			if(string.length()>0){
-				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
-				if(c==buckets){
-					c=buckets-1;
+			if(var < 0){
+				if(string.length()>0){
+					return string;
+				}else{
+					return "missing";
 				}
-				DecimalFormat df = new DecimalFormat("#.##");
-				float min = mins[var];
-				
-				String s = df.format(min+(c*divider[var]))+ "-" + df.format(min+((c+1)*divider[var]));
-				s = s.replace(",",".");
-				return s;
 			}else{
-				return string;
+				if(string.length()>0){
+					int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
+					if(c==buckets){
+						c=buckets-1;
+					}	
+					if(c == -1){
+						System.out.println("wow <------------------------------------------------------ var - " + var);
+						System.out.println("min - "+ mins[var] + " real - "+ string);
+						c=0;
+					}
+
+					String s = "B"+c;
+					return s;
+				}else{
+					return "missing"; //string;
+				}
 			}
 		}
 	}
+
+	/* discretize with N buckets and  var :  var-1, var-2 */
+	//	public String discretize(int var ,String string) {
+	//		var--;
+	//		if(var ==12){ 
+	//			int i;
+	//			try{
+	//				i = Integer.parseInt(string);
+	//			}catch(Exception e) {
+	//				return "";
+	//			}
+	//			if(i<=10){
+	//				return "{0-12}";
+	//			}else {
+	//				if(i<=20){
+	//					return "{12-24}";
+	//				}else{
+	//					if(i<30){
+	//						return "{24-36}";
+	//					}else {
+	//						return "{36-48}";
+	//					}
+	//				}
+	//			}
+	//		}else{
+	//			if(string.length()>0){
+	//				int c = (int)((Float.parseFloat(string)-mins[var])/divider[var]);
+	//				if(c==buckets){
+	//					c=buckets-1;
+	//				}
+	//				
+	//				String s = var + "B"+c;
+	//				return s;
+	//			}else{
+	//				return "missing"; //string;
+	//			}
+	//		}
+	//	}
 
 	private void alternativeApproach(int in) throws IOException, FileNotFoundException {
 		steps = in;

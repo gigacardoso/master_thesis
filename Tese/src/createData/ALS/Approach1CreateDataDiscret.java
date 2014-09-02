@@ -265,6 +265,8 @@ public class Approach1CreateDataDiscret {
 		BufferedWriter outSVC5 = new BufferedWriter(new FileWriter(approach1Output+File.separator+"approach1_Demo2_"+steps+".csv"));
 		BufferedWriter outSVC6 = new BufferedWriter(new FileWriter(approach1Output+File.separator+"approach1_Demo3_"+steps+".csv"));
 
+		CreateDataDiscret t = new CreateDataDiscret();
+		
 		String line1;
 		line1 = inVitals.readLine();
 		
@@ -311,7 +313,7 @@ public class Approach1CreateDataDiscret {
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
 				att2 += split[1];
-				att3 += split[2];
+				att3 +=split[2];
 				att6 += split[3];
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');

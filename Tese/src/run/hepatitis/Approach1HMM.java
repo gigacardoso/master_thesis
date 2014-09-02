@@ -1,5 +1,4 @@
 package run.hepatitis;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -8,9 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Set;
 
 import utils.DefaultHashMap;
@@ -28,131 +27,125 @@ import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Remove;
 import createData.ALS.CreateData;
 
-public class Approach2 {
+public class Approach1HMM {
 	private String data = "C:\\hepat_data030704\\";
 	private String path = data +"data\\";
 	private String andreia = data + "andreia\\";
+	private String hmm = path + "predictionsHMM\\";
 	private static String[] classes_simb = {"F0","F1","F2","F3","F4"};
-	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
-	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
+	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
+	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+	//private String[] examsHMM = {"T-BIL"};
+	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
+	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
+	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
 	private static int steps = 12;
-	private  int folds = 10;
 
 	long[] examsTime = new long[exams.length];
 	static long start,predictionsTime,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	static ArrayList<String> accuracies = new ArrayList<String>();
 	public static void main(String[] args){
 		try {
-			not_hmm();
+			hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
-						Approach2 a = new Approach2();
-						a.ClassifyDiagnostic(new NaiveBayes());
-			//			j48 = new J48();
-			//			j48.setMinNumObj(50);
-			//			a.ClassifyDiagnostic(new J48());
-			//			a.ClassifyDiagnostic(new AdaBoostM1());
+			//						a.ClassifyDiagnostic(new NaiveBayes());
+
+			//						a.ClassifyDiagnostic(new J48());
+			//						a.ClassifyDiagnostic(new AdaBoostM1());
 			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
-			//			a.ClassifyDiagnostic(new Logistic());
+			//						a.ClassifyDiagnostic(new Logistic());
+			//a.ClassifyDiagnostic(new RandomForest());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static void not_hmm() throws IOException, Exception,
+	private static void hmm() throws IOException, Exception,
 	FileNotFoundException {
-		Approach2 a = new Approach2();
-		start = System.currentTimeMillis();
-		Logistic j = new Logistic();
-		a.predictExams(j);
-		predictionsTime = System.currentTimeMillis();
-		//a.evaluatePredictions();
-		a.buildDataWithPredictionsSorted();
-		startClassification = System.currentTimeMillis();
-		a.ClassifyData(new NaiveBayes(), "");
-		endNaive = System.currentTimeMillis();
+		Approach1HMM a = new Approach1HMM();
+		a.evaluatePredictionsHMM();
+		a.buildDataWithHMMPredictionsSorted();
+		Classifier j = null;
 		Utils u = new Utils();
+		accuracies = new ArrayList<String>();
+		a.ClassifyData(new NaiveBayes(), "");
 		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "NaiveBayes");
-		a.ClassifyData(new RandomForest(), "");
-		endRF = System.currentTimeMillis();
-		matrix = a.buildConfussionMatrix("RandomForest", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "RandomForest");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "NaiveBayes");
 		a.ClassifyData(new J48(), "");
-		endDT = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("J48","");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "J48");
-		a.ClassifyData(new Logistic(), "");
-		endLogistic = System.currentTimeMillis();
-		matrix = a.buildConfussionMatrix("Logistic", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "Logistic");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "J48");
 		a.ClassifyData(new AdaBoostM1(), "");
-		endAdaboost = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("AdaBoost","");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach2", steps, "AdaBoost");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "AdaBoost");
+		a.ClassifyData(new Logistic(), "");
+		matrix = a.buildConfussionMatrix("Logistic", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "Logistic");
+		a.ClassifyData(new RandomForest(), "");
+		matrix = a.buildConfussionMatrix("RandomForest", "");
+		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "RandomForest");
 		
-		//a.writeTimes(j);
+		for (String s : accuracies) {
+			System.out.println(s);
+		}
 	}
 
-	void ClassifyDiagnostic(Classifier classifier) {
-		System.out.println("Classify Diagnostic");
-		try{
-			Instances data = new Instances(new BufferedReader(new FileReader(path+"Diagnosis.arff")));
-			data.setClassIndex(data.numAttributes() - 1);
-
-			// Create Classifier
-			Remove remove = new Remove();                         // new instance of filter
-			remove.setAttributeIndices("1");					// set options
-
-			FilteredClassifier cModel = new FilteredClassifier();
-			//			Classifier cModel = classifier;
-			cModel.setFilter(remove);
-			cModel.setClassifier(classifier);
-			// train and make predictions
-			//			cModel.buildClassifier(data);
-
-			Evaluation eval = new Evaluation(data);
-			eval.crossValidateModel(cModel, data, 10, new Random(1));
-			// Print the result à la Weka explorer:
-			String strSummary = eval.toSummaryString();
-			//				System.out.println(cModel.toString());
-
-			//Get the confusion matrix
-			//			double[][] matrix = eval.confusionMatrix();
-			System.out.println("\n\t\t"+ classifier.getClass().toString());
-			System.out.println(strSummary);
-			System.out.println(eval.toMatrixString());
-			//			String[] val = {"{36-48}","{24-36}","{12-24}","{0-12}"};
-			//			System.out.println("\t\t{36-48}\t{24-36}\t{12-24}\t{0-12}");
-			//			for(int i=0; i<4;i++){
-			//				System.out.print(val[i] + "\t|");
-			//				for(int j= 0;j<4;j++){
-			//					System.out.print(matrix[i][j]+ "\t\t|");
-			//				}
-			//				System.out.println();
-			//			}
-			//			double tru = 0;
-			//			double fal = 0;
-			//			double bad = 0;
-			//			for(int i=0; i<4;i++){
-			//				for(int j= 0;j<4;j++){
-			//					if(i==j){
-			//						tru +=matrix[i][j]; 
-			//					}else{
-			//						bad +=matrix[i][j];
-			//					}				
-			//					fal += matrix[i][j];
-			//				}
-			//			}
-			//			double accuracy = tru/fal;
-			//			double errorRate = bad/fal;
-			//			System.out.println("\nCorrectly Classified Instances\t\t"+ tru +"\t\t" + (accuracy*100) + " %");
-			//			System.out.println("Inorrectly Classified Instances\t\t"+ bad +"\t\t" + (errorRate*100) + " %");
+	private void evaluatePredictionsHMM() throws IOException {
+		ArrayList<String> examsIndexes = new ArrayList<String>( Arrays.asList(indices));
+		//String[] exams = {/*"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL",*/"ALB","CHE"/*,"T-CHO","TP"*/,"Type"};//,"Activity"};
+		for(int i= 0; i<examsHMM.length;i++){
+			BufferedReader pred = new BufferedReader(new FileReader(hmm+examsHMM[i]+"_Predictions.csv"));
+			String line = null;
+			DefaultHashMap<String, String> e = new DefaultHashMap<String, String>("");
+			while((line = pred.readLine()) != null){
+				String[] split = line.split(",",-1);
+				String id = split[0];
+				String p = split[1];// "N";
+				e.put(id, p);
+			}
+			predictionsHMM.put(examsHMM[i], e);
+			pred.close();
 		}
-		catch (Exception e){
-			e.printStackTrace();
+
+
+		BufferedReader real = new BufferedReader(new FileReader(path+"DiagnosisReal.csv"));
+		real.readLine();
+		String line;
+		HashMap<String,Integer> correct = new HashMap<String, Integer>();
+		int total = 0;
+		while((line = real.readLine()) != null){
+			String[] split = line.split(",",-1);
+			String id = split[0];
+			for(int i= 0; i<examsHMM.length;i++){
+				DefaultHashMap<String, String> e = predictionsHMM.get(examsHMM[i]);
+
+				if(split[5+examsIndexes.indexOf(examsHMM[i])].equals(e.get(id))){
+					Integer count = correct.get(examsHMM[i]);
+					if(count == null){
+						count = 1;
+					}else{
+						count++;
+					}
+					correct.put(examsHMM[i],count);
+				}
+			}
+			total++;
 		}
+		real.close();
+		System.out.println("\nTotal predictions ->\t" + total);
+		double average = 0;
+		DecimalFormat df = new DecimalFormat("#.##");
+		for(String exam:examsHMM){
+			//System.out.println(exam);
+			Integer count = correct.get(exam);
+			double perc = ((double)count)/total *100;
+			average += perc;
+			System.out.println(exam + "\t->\t"+ /*count+" / "+ total+ "\t"+*/ df.format(perc) + " %" );
+		}
+		System.out.println("\nAverage - "+ df.format(average/examsHMM.length) + " %");
+
+
 	}
 
 	private  int[][] buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
@@ -160,7 +153,7 @@ public class Approach2 {
 		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"labeled"+string+".arff")));
 		Instances real = new Instances(new BufferedReader(new FileReader(path+"DiagnosisReal.arff")));
 		HashMap<String,Integer> indexes = new HashMap<String, Integer>();
-		String[] classes ={"F0","F1","F2","F3","F4"}; //{"B1","B2","B3","B4","C0","C1","C2","C3","C4"};
+		String[] classes ={"F0","F1","F2","F3","F4"}; 
 		int u=0;
 		for(String c:classes){
 			indexes.put(c,u);
@@ -219,6 +212,7 @@ public class Approach2 {
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		accuracies.add(df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
+
 		return matrix;
 	}
 
@@ -249,13 +243,13 @@ public class Approach2 {
 		//		cModel.buildClassifier(train);
 
 		// Test the model
-		//		Evaluation eTest = new Evaluation(test);
-		//		eTest.evaluateModel(cModel, test);
+		//				Evaluation eTest = new Evaluation(test);
+		//				eTest.evaluateModel(cModel, test);
 
 		// Print the result à la Weka explorer:
-		//		String strSummary = eTest.toSummaryString();
+		//				String strSummary = eTest.toSummaryString();
 		//		System.out.println(cModel.toString());
-		//		System.out.println(strSummary);
+		//				System.out.println(strSummary);
 		//		System.out.println("--------------------------------");
 
 		for (int i = 0; i < test.numInstances(); i++) {
@@ -265,6 +259,11 @@ public class Approach2 {
 			//			System.out.println("---------------");
 			labeled.instance(i).setClassValue(clsLabel);
 		}
+
+		Evaluation eTest = new Evaluation(labeled);
+		eTest.evaluateModel(cModel, labeled);
+		System.out.println(eTest.toSummaryString());
+
 
 		BufferedWriter writer = new BufferedWriter(
 				new FileWriter(path+"labeled"+string+".arff"));
@@ -293,7 +292,7 @@ public class Approach2 {
 		inFact.close();
 	}
 
-	private  void buildDataWithPredictionsSorted() throws IOException {
+	private  void buildDataWithHMMPredictionsSorted() throws IOException {
 		System.out.println("build Data With Predictions");
 		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
@@ -305,7 +304,7 @@ public class Approach2 {
 
 		readPatients();
 
-		Set<String> keys = predictions.get(exams[0]).keySet();
+		Set<String> keys = predictionsHMM.get(exams[0]).keySet();
 		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for(String key: keys){
 			ids.add(Integer.parseInt(key));
@@ -323,7 +322,7 @@ public class Approach2 {
 				patientWith += split[i]+",";
 			}
 			for(String exam:exams){
-				patientWith += predictions.get(exam).get(key) + ",";
+				patientWith += predictionsHMM.get(exam).get(key) + ",";
 			}
 			outPredictions.write(patientWith +'\n');
 		}
@@ -357,81 +356,5 @@ public class Approach2 {
 			e.printStackTrace();
 		}
 
-	}
-
-	private  void predictExams(Classifier classifier) throws IOException {
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-		HashMap<String,HashMap<Double,String>> indexes = getIndexes(exams);
-		try{
-			for(int i= 0; i< exams.length;i++){
-				Instances data = new Instances(new BufferedReader(new FileReader(path+exams[i]+"_2.arff")));
-
-				Random rand = new Random(1);   // create seeded number generator
-				Instances randData = new Instances(data);   // create copy of original data
-				randData.randomize(rand); 
-
-				for (int n = 0; n < folds; n++) {
-					Instances train = randData.trainCV(folds, n);
-					Instances test = randData.testCV(folds, n);
-
-					// Set class index
-					train.setClassIndex(train.numAttributes() - 1);
-					test.setClassIndex(test.numAttributes() - 1);
-
-					// Create Classifier
-					Classifier cModel = classifier;   
-					cModel.buildClassifier(train);
-
-					// Test the model
-					Evaluation eTest = new Evaluation(test);
-					eTest.evaluateModel(cModel, test);
-
-					// Print the result à la Weka explorer:
-					//					String strSummary = eTest.toSummaryString();
-					//					System.out.println(cModel.toString());
-					//					System.out.println(strSummary);
-					//					System.out.println("--------------------------------");
-					DefaultHashMap<String,String> exam = predictions.get(exams[i]);
-					if(exam == null){
-						exam = new DefaultHashMap<String, String>("");
-					}
-					for(Instance ins:test){
-						//						System.out.print(ins.toString());
-						Double d = cModel.classifyInstance(ins);
-						//						System.out.println("\t-> "+d);
-						String in = (ins.toString().split(","))[0];
-						exam.put(in , indexes.get(exams[i]).get(d));
-					}
-					predictions.put(exams[i], exam);
-				}
-				examsTime[i] = System.currentTimeMillis();
-			}
-
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-	}
-
-	private HashMap<String, HashMap<Double, String>> getIndexes(String[] exams) throws IOException {
-		HashMap<String, HashMap<Double, String>> indexes = new HashMap<String, HashMap<Double,String>>();
-		for(String exam: exams){
-			System.out.println(exam);
-			BufferedReader arff = new BufferedReader(new FileReader(path +exam +".arff"));
-			for(int i=0; i< 2+steps; i++){
-				arff.readLine();
-			}
-			String line = arff.readLine();
-			line = line.split(" ")[2];
-			line = line.substring(1,line.length()-1);
-			String[] split = line.split(",");
-			HashMap<Double, String> e = new HashMap<Double, String>();
-			for(int i = 0; i< split.length ; i++){
-				e.put((double)i, split[i]);
-			}
-			indexes.put(exam, e);
-			arff.close();
-		}
-		return indexes;
 	}
 }

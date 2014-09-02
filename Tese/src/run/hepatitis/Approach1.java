@@ -33,16 +33,13 @@ public class Approach1 {
 	private String path = data +"data\\";
 	private String times = path + "times\\";
 	private String andreia = data + "andreia\\";
-	private String hmm = path + "predictionsHMM\\";
 	private static String[] classes_simb = {"F0","F1","F2","F3","F4"};
 	//String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL"/*,"ALB","CHE","T-CHO","TP"*/,"Type"};//,"Activity"};
 	private String[] indices = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	//private String[] examsHMM = {"T-BIL"};
-	private String[] examsHMM = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
 	private DefaultHashMap<String, String> patients = new DefaultHashMap<String, String>("");
 	private  HashMap<String,DefaultHashMap<String,String>> predictions = new HashMap<String,DefaultHashMap<String,String>>();
-	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
 	private static int steps = 12;
 	private  int folds = 10;
 
@@ -51,12 +48,11 @@ public class Approach1 {
 	static ArrayList<String> accuracies = new ArrayList<String>();
 	public static void main(String[] args){
 		try {
-			hmm();
-//			not_hmm();
+			not_hmm();
 
 			System.out.println("------------------\tDiagnostic\t------------------");
-			//						a.ClassifyDiagnostic(new NaiveBayes());
-
+//			Approach2 a = new Approach2();
+//			a.ClassifyDiagnostic(new NaiveBayes());
 			//						a.ClassifyDiagnostic(new J48());
 			//						a.ClassifyDiagnostic(new AdaBoostM1());
 			//			a.ClassifyDiagnostic(new MultilayerPerceptron());
@@ -67,40 +63,6 @@ public class Approach1 {
 		}
 	}
 
-	private static void hmm() throws IOException, Exception,
-	FileNotFoundException {
-		Approach1 a = new Approach1();
-		//			a.predictExams(new J48());
-		//			a.evaluatePredictions();
-		a.evaluatePredictionsHMM();
-		//a.buildDataWithPredictionsSorted();
-		a.buildDataWithHMMPredictionsSorted();
-		//			a.buildDataWithPredictionsUnsorted();
-		Classifier j = null;
-		Utils u = new Utils();
-		accuracies = new ArrayList<String>();
-		//			a.buildDataWithHMMPredictionsUnsorted();
-		a.ClassifyData(new NaiveBayes(), "");
-		int[][] matrix = a.buildConfussionMatrix("Naive Bayes", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "NaiveBayes");
-		a.ClassifyData(new J48(), "");
-		matrix = a.buildConfussionMatrix("J48","");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "J48");
-		a.ClassifyData(new AdaBoostM1(), "");
-		matrix = a.buildConfussionMatrix("AdaBoost","");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "AdaBoost");
-		a.ClassifyData(new Logistic(), "");
-		matrix = a.buildConfussionMatrix("Logistic", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "Logistic");
-		a.ClassifyData(new RandomForest(), "");
-		matrix = a.buildConfussionMatrix("RandomForest", "");
-		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1(4,10,II)", steps, "RandomForest");
-		
-		for (String s : accuracies) {
-			System.out.println(s);
-		}
-	}
-
 	private static void not_hmm() throws IOException, Exception,
 	FileNotFoundException {
 		Approach1 a = new Approach1();
@@ -108,9 +70,8 @@ public class Approach1 {
 		J48 j = new J48();
 		a.predictExams(j);
 		predictionsTime = System.currentTimeMillis();
-		//a.evaluatePredictions();
+		a.evaluatePredictions();
 		a.buildDataWithPredictionsSorted();
-		//			a.buildDataWithPredictionsUnsorted();
 		startClassification = System.currentTimeMillis();
 		a.ClassifyData(new NaiveBayes(), "");
 		endNaive = System.currentTimeMillis();
@@ -134,7 +95,7 @@ public class Approach1 {
 		matrix = a.buildConfussionMatrix("AdaBoost","");
 		u.metrics(matrix,classes_simb,"Hepatitis",j,"Approach1", steps, "AdaBoost");
 
-		//a.writeTimes(j);
+		a.writeTimes(j);
 	}
 
 	private void writeTimes(Classifier j) throws IOException {
@@ -158,96 +119,6 @@ public class Approach1 {
 		out.write("AdaBoost"+";" + (endAdaboost - endDT) + "\n");
 		out.write("Logistics"+";" + (endLogistic - endAdaboost) + "\n");
 		out.close();
-	}
-
-	private void evaluatePredictionsHMM() throws IOException {
-		ArrayList<String> examsIndexes = new ArrayList<String>( Arrays.asList(indices));
-		//String[] exams = {/*"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL",*/"ALB","CHE"/*,"T-CHO","TP"*/,"Type"};//,"Activity"};
-		for(int i= 0; i<examsHMM.length;i++){
-			BufferedReader pred = new BufferedReader(new FileReader(hmm+examsHMM[i]+"_Predictions.csv"));
-			String line = null;
-			DefaultHashMap<String, String> e = new DefaultHashMap<String, String>("");
-			while((line = pred.readLine()) != null){
-				String[] split = line.split(",",-1);
-				String id = split[0];
-				String p = split[1];// "N";
-				e.put(id, p);
-			}
-			predictionsHMM.put(examsHMM[i], e);
-			pred.close();
-		}
-
-
-		BufferedReader real = new BufferedReader(new FileReader(path+"DiagnosisReal.csv"));
-		real.readLine();
-		String line;
-		HashMap<String,Integer> correct = new HashMap<String, Integer>();
-		int total = 0;
-		while((line = real.readLine()) != null){
-			String[] split = line.split(",",-1);
-			String id = split[0];
-			for(int i= 0; i<examsHMM.length;i++){
-				DefaultHashMap<String, String> e = predictionsHMM.get(examsHMM[i]);
-
-				if(split[5+examsIndexes.indexOf(examsHMM[i])].equals(e.get(id))){
-					Integer count = correct.get(examsHMM[i]);
-					if(count == null){
-						count = 1;
-					}else{
-						count++;
-					}
-					correct.put(examsHMM[i],count);
-				}
-			}
-			total++;
-		}
-		real.close();
-		System.out.println("\nTotal predictions ->\t" + total);
-		double average = 0;
-		DecimalFormat df = new DecimalFormat("#.##");
-		for(String exam:examsHMM){
-			//System.out.println(exam);
-			Integer count = correct.get(exam);
-			double perc = ((double)count)/total *100;
-			average += perc;
-			System.out.println(exam + "\t->\t"+ /*count+" / "+ total+ "\t"+*/ df.format(perc) + " %" );
-		}
-		System.out.println("\nAverage - "+ df.format(average/examsHMM.length) + " %");
-
-
-	}
-
-	private void compareLabeled() throws FileNotFoundException, IOException {
-		System.out.println("\nCompare Labeled");
-		Instances labeled = new Instances(new BufferedReader(new FileReader(path+"PredictionDataWithDemo"+steps+".arff")));
-		Instances real = new Instances(new BufferedReader(new FileReader(path+"PredictionDataWithDemoUnsorted"+steps+".arff")));
-		HashMap<String,Integer> indexes = new HashMap<String, Integer>();
-		String[] classes ={"F0","F1","F2","F3","F4"}; //{"B1","B2","B3","B4","C0","C1","C2","C3","C4"};
-		int u=0;
-		for(String c:classes){
-			indexes.put(c,u);
-			u++;
-		}
-		int[][] matrix = new int[classes.length][classes.length];
-
-		for(int i= 0; i<labeled.numInstances(); i++){
-			Instance ins = labeled.get(i);
-			String[] str = ins.toString().split(",",-1);
-			for(int j= 0; j<real.numInstances(); j++){
-				Instance ins2 = real.get(j);
-				String[] str2 = ins2.toString().split(",",-1);
-				if(str2[0].equals(str[0])){
-					System.out.println("s- "+ ins2);
-					System.out.println("u- "+ins);
-					System.out.println("---------------------------------");
-					if(str2[ins2.numAttributes()-1].equals("?") || str[ins2.numAttributes()-1].equals("?")){
-						break;
-					}
-					matrix[indexes.get(str2[ins2.numAttributes()-1])][indexes.get(str[ins2.numAttributes()-1])]++;
-					break;
-				}
-			}
-		}		
 	}
 
 	private void evaluatePredictions() throws IOException {
@@ -289,66 +160,6 @@ public class Approach1 {
 		System.out.println("\nAverage - "+ df.format(average/exams.length) + " %");
 
 
-	}
-
-	private  void ClassifyDiagnostic(Classifier classifier) {
-		System.out.println("Classify Diagnostic");
-		try{
-			Instances data = new Instances(new BufferedReader(new FileReader(path+"Diagnosis.arff")));
-			data.setClassIndex(data.numAttributes() - 1);
-
-			// Create Classifier
-			Remove remove = new Remove();                         // new instance of filter
-			remove.setAttributeIndices("1");					// set options
-
-			FilteredClassifier cModel = new FilteredClassifier();
-			//			Classifier cModel = classifier;
-			cModel.setFilter(remove);
-			cModel.setClassifier(classifier);
-			// train and make predictions
-			//			cModel.buildClassifier(data);
-
-			Evaluation eval = new Evaluation(data);
-			eval.crossValidateModel(cModel, data, 10, new Random(1));
-			// Print the result à la Weka explorer:
-			String strSummary = eval.toSummaryString();
-			//				System.out.println(cModel.toString());
-
-			//Get the confusion matrix
-			//			double[][] matrix = eval.confusionMatrix();
-			System.out.println("\n\t\t"+ classifier.getClass().toString());
-			System.out.println(strSummary);
-			System.out.println(eval.toMatrixString());
-			//			String[] val = {"{36-48}","{24-36}","{12-24}","{0-12}"};
-			//			System.out.println("\t\t{36-48}\t{24-36}\t{12-24}\t{0-12}");
-			//			for(int i=0; i<4;i++){
-			//				System.out.print(val[i] + "\t|");
-			//				for(int j= 0;j<4;j++){
-			//					System.out.print(matrix[i][j]+ "\t\t|");
-			//				}
-			//				System.out.println();
-			//			}
-			//			double tru = 0;
-			//			double fal = 0;
-			//			double bad = 0;
-			//			for(int i=0; i<4;i++){
-			//				for(int j= 0;j<4;j++){
-			//					if(i==j){
-			//						tru +=matrix[i][j]; 
-			//					}else{
-			//						bad +=matrix[i][j];
-			//					}				
-			//					fal += matrix[i][j];
-			//				}
-			//			}
-			//			double accuracy = tru/fal;
-			//			double errorRate = bad/fal;
-			//			System.out.println("\nCorrectly Classified Instances\t\t"+ tru +"\t\t" + (accuracy*100) + " %");
-			//			System.out.println("Inorrectly Classified Instances\t\t"+ bad +"\t\t" + (errorRate*100) + " %");
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
 	}
 
 	private  int[][] buildConfussionMatrix(String method, String string) throws FileNotFoundException, IOException {
@@ -535,132 +346,6 @@ public class Approach1 {
 		//		File a = new File(path + "PredictionDataWithDemo.csv" );
 		//		a.delete();
 		ChangeClassPreditions("PredictionDataWithDemo");
-	}
-
-	private  void buildDataWithHMMPredictionsSorted() throws IOException {
-		System.out.println("build Data With Predictions");
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
-		String header = diag.readLine();
-		diag.close();
-		BufferedWriter outPredictions = new BufferedWriter(new FileWriter(path+"PredictionDataWithDemo.csv"));
-		outPredictions.write(header+ '\n');
-		String patientWith = "";
-
-		readPatients();
-
-		Set<String> keys = predictionsHMM.get(exams[0]).keySet();
-		ArrayList<Integer> ids = new ArrayList<Integer>();
-		for(String key: keys){
-			ids.add(Integer.parseInt(key));
-		}
-		Collections.sort(ids);
-		//		List<String> ids = new ArrayList<String>();
-		//		ids.addAll(keys);
-		//		Collections.sort(ids);
-		for(Integer id: ids){
-			//			System.out.println(id);
-			patientWith = "";
-			String key = id+"";
-			String[] split = patients.get(key).split("\t",-1);
-			for(int i=0; i< split.length; i++){
-				patientWith += split[i]+",";
-			}
-			for(String exam:exams){
-				patientWith += predictionsHMM.get(exam).get(key) + ",";
-			}
-			outPredictions.write(patientWith +'\n');
-		}
-		outPredictions.close();
-		CreateData create = new CreateData();
-		create.CSV2arff(path,"PredictionDataWithDemo");
-		//		File a = new File(path + "PredictionDataWithDemo.csv" );
-		//		a.delete();
-		ChangeClassPreditions("PredictionDataWithDemo");
-	}
-
-	private  void buildDataWithPredictionsUnsorted() throws IOException {
-		System.out.println("build Data With Predictions");
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
-		String header = diag.readLine();
-		diag.close();
-		BufferedWriter outPredictions = new BufferedWriter(new FileWriter(path+"PredictionDataWithDemoUnsorted.csv"));
-		outPredictions.write(header+ '\n');
-		String patientWith = "";
-
-		readPatients();
-
-		Set<String> keys = predictions.get(exams[0]).keySet();
-		ArrayList<Integer> ids = new ArrayList<Integer>();
-		for(String key: keys){
-			ids.add(Integer.parseInt(key));
-		}
-		//		Collections.sort(ids);
-		//		List<String> ids = new ArrayList<String>();
-		//		ids.addAll(keys);
-		//		Collections.sort(ids);
-		for(Integer id: ids){
-			//			System.out.println(id);
-			patientWith = "";
-			String key = id+"";
-			String[] split = patients.get(key).split("\t",-1);
-			for(int i=0; i< split.length; i++){
-				patientWith += split[i]+",";
-			}
-			for(String exam:exams){
-				patientWith += predictions.get(exam).get(key) + ",";
-			}
-			outPredictions.write(patientWith +'\n');
-		}
-		outPredictions.close();
-		CreateData create = new CreateData();
-		create.CSV2arff(path,"PredictionDataWithDemoUnsorted");
-		//		File a = new File(path + "PredictionDataWithDemo.csv" );
-		//		a.delete();
-		ChangeClassPreditions("PredictionDataWithDemoUnsorted");
-	}
-
-	private  void buildDataWithHMMPredictionsUnsorted() throws IOException {
-		System.out.println("build Data With Predictions");
-		String[] exams = {"GPT","GOT","ZTT","TTT","T-BIL","D-BIL","I-BIL","ALB","CHE","T-CHO","TP","Type","Activity"};
-		BufferedReader diag = new BufferedReader(new FileReader(path +"Diagnosis.csv"));
-		String header = diag.readLine();
-		diag.close();
-		BufferedWriter outPredictions = new BufferedWriter(new FileWriter(path+"PredictionDataWithDemoUnsorted.csv"));
-		outPredictions.write(header+ '\n');
-		String patientWith = "";
-
-		readPatients();
-
-		Set<String> keys = predictionsHMM.get(exams[0]).keySet();
-		ArrayList<Integer> ids = new ArrayList<Integer>();
-		for(String key: keys){
-			ids.add(Integer.parseInt(key));
-		}
-		//		Collections.sort(ids);
-		//		List<String> ids = new ArrayList<String>();
-		//		ids.addAll(keys);
-		//		Collections.sort(ids);
-		for(Integer id: ids){
-			//			System.out.println(id);
-			patientWith = "";
-			String key = id+"";
-			String[] split = patients.get(key).split("\t",-1);
-			for(int i=0; i< split.length; i++){
-				patientWith += split[i]+",";
-			}
-			for(String exam:exams){
-				patientWith += predictionsHMM.get(exam).get(key) + ",";
-			}
-			outPredictions.write(patientWith +'\n');
-		}
-		outPredictions.close();
-		CreateData create = new CreateData();
-		create.CSV2arff(path,"PredictionDataWithDemoUnsorted");
-		//		File a = new File(path + "PredictionDataWithDemo.csv" );
-		//		a.delete();
-		ChangeClassPreditions("PredictionDataWithDemoUnsorted");
 	}
 
 	private  void ChangeClassPreditions(String name) {

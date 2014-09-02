@@ -54,7 +54,7 @@ public class AlternativeApproach {
 			//				System.out.println(cModel.toString());
 
 			//Get the confusion matrix
-			double[][] matrix = eval.confusionMatrix();
+//			double[][] matrix = eval.confusionMatrix();
 			System.out.println("\n\t\t"+ classifier.getClass().toString());
 			System.out.println(strSummary);
 			//			String[] val = {"{36-48}","{24-36}","{12-24}","{0-12}"};
