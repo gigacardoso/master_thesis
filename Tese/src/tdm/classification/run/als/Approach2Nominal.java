@@ -37,7 +37,7 @@ public class Approach2Nominal {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> demoAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 	
-	private static int steps = 5;
+	private static int steps = 6;
 	private  int folds = 10;
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
@@ -79,19 +79,19 @@ public class Approach2Nominal {
 		a.ClassifyData(new RandomForest());
 		endRF = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("RandomForest");
-//		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "RandomForest");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "RandomForest");
 		a.ClassifyData(new J48());
 		endDT = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("J48");
-//		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "J48");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "J48");
 		a.ClassifyData(new Logistic());
 		endLogistic = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("Logistic");
-//		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "Logistic");
 		a.ClassifyData(new AdaBoostM1());
 		endAdaboost = System.currentTimeMillis();
 		matrix = a.buildConfussionMatrix("AdaBoost");
-//		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "AdaBoost");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2_Nominal", steps, "AdaBoost");
 		
 		a.writeTimes();
 		System.out.println("------------------\tDiagnostic\t------------------");

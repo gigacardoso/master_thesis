@@ -45,7 +45,11 @@ public class Utils {
 				classs = split[split.length-1];
 			}
 			else{
-				classs = "HMM";
+				if(approach.equals("BaselineSingle") || approach.equals("BaselineMulti")){
+					classs = "base";
+				}else{
+					classs = "HMM";
+				}
 			}
 			System.out.println(classs);
 			BufferedWriter out = new BufferedWriter(new FileWriter(path+ds+"_"+classs+"_"+approach+"_"+algorithm+"_"+steps+".csv"));

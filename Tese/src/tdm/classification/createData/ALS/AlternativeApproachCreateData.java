@@ -15,10 +15,17 @@ import weka.core.converters.CSVLoader;
 public class AlternativeApproachCreateData {
 	private   String alternativeOutput;
 	private   int steps;
+	private CreateDataDiscret t;
 		
 	public AlternativeApproachCreateData(String alternativeOutput2, int steps2) {
 		alternativeOutput = alternativeOutput2;
 		steps = steps2;
+		try {
+			t = new CreateDataDiscret();
+			t.findMinsDivider();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void createData(int stp) throws IOException{
@@ -61,7 +68,6 @@ public class AlternativeApproachCreateData {
 		String[] split2 = line2.split(",",-1);
 		patient += /*split2[14] + "," +*/ split2[15].replace(' ', '_') +"_"+steps;
 		out.write(patient+'\n');
-		CreateDataDiscret t = new CreateDataDiscret();
 		
 		int last = 0;
 		ArrayList<String> lines1 = new ArrayList<String>();
@@ -99,23 +105,23 @@ public class AlternativeApproachCreateData {
 													splitHeight = lines3.get(0).split(",",-1);
 													split4 = lines4.get((lines4.size()-1)).split(",",-1);
 													patient = last+ ",";
-													patient += split4[4] + "," + t.discretize(1,split4[11]) + ","+ t.discretize(2,splitHeight[4]) + ",";
+													patient += split4[4] + "," + t.discretize(last,1,split4[11]) + ","+ t.discretize(last,2,splitHeight[4]) + ",";
 //													patient += ",";
 													for(int i=0 ; i < steps-1; i++){
 														String[] split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-														patient += t.discretize(3,split[2]) + "," + t.discretize(4,split[5]) + ","
-														+ t.discretize(5,split[6]) + "," + t.discretize(6,split[7])+",";
+														patient += t.discretize(last,3,split[2]) + "," + t.discretize(last,4,split[5]) + ","
+														+ t.discretize(last,5,split[6]) + "," + t.discretize(last,6,split[7])+",";
 														String[] split3 = lines3.get(((lines3.size()-steps)+i)).split(",",-1);
-														patient += t.discretize(7,split3[2]) + "," + t.discretize(8,split3[3]) + "," + t.discretize(9,split3[6]) + ","
-																+ t.discretize(10,split3[7]) + "," + t.discretize(11,split3[8]) + "," + t.discretize(12,split3[9]) + ",";
+														patient += t.discretize(last,7,split3[2]) + "," + t.discretize(last,8,split3[3]) + "," + t.discretize(last,9,split3[6]) + ","
+																+ t.discretize(last,10,split3[7]) + "," + t.discretize(last,11,split3[8]) + "," + t.discretize(last,12,split3[9]) + ",";
 														split2 = lines2.get(((lines2.size()-steps)+i)).split(",",-1);
-														String discret = t.discretize(13,split2[15]);
+														String discret = t.discretize(last,13,split2[15]);
 														patient += /*split2[14] + "," + */ discret+",";//split2[15] + ",";
 	//													patient += "|,";
 													}
 													//just the class of n+1
 													split2 = lines2.get((lines2.size()-1)).split(",",-1);
-													String discret = t.discretize(13,split2[15]);
+													String discret = t.discretize(last,13,split2[15]);
 													patient += /*split2[14] + "," + */ discret;//split2[15];
 													out.write(patient+'\n');
 
@@ -198,7 +204,6 @@ public class AlternativeApproachCreateData {
 		String[] split2 = line2.split(",",-1);
 		patient += split2[15].replace(' ', '_') +"_"+steps;
 		out.write(patient+'\n');
-		CreateDataDiscret t = new CreateDataDiscret();
 		
 		int last = 0;
 		ArrayList<String> lines1 = new ArrayList<String>();
@@ -236,19 +241,19 @@ public class AlternativeApproachCreateData {
 													splitHeight = lines3.get(0).split(",",-1);
 													split4 = lines4.get((lines4.size()-1)).split(",",-1);
 													patient = last+ ",";
-													patient += split4[4] + "," + t.discretize(1,split4[11]) + ","+ t.discretize(2,splitHeight[4]) + ",";
+													patient += split4[4] + "," + t.discretize(last,1,split4[11]) + ","+ t.discretize(last,2,splitHeight[4]) + ",";
 
 													for(int i=0 ; i < steps-1; i++){
 														String[] split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-														patient += t.discretize(3,split[2]) + "," + t.discretize(4,split[5]) + ","
-														+ t.discretize(5,split[6]) + "," + t.discretize(6,split[7])+",";
+														patient += t.discretize(last,3,split[2]) + "," + t.discretize(last,4,split[5]) + ","
+														+ t.discretize(last,5,split[6]) + "," + t.discretize(last,6,split[7])+",";
 														String[] split3 = lines3.get(((lines3.size()-steps)+i)).split(",",-1);
-														patient += t.discretize(7,split3[2]) + "," + t.discretize(8,split3[3]) + "," + t.discretize(9,split3[6]) + ","
-																+ t.discretize(10,split3[7]) + "," + t.discretize(11,split3[8]) + "," + t.discretize(12,split3[9]) + ",";
+														patient += t.discretize(last,7,split3[2]) + "," + t.discretize(last,8,split3[3]) + "," + t.discretize(last,9,split3[6]) + ","
+																+ t.discretize(last,10,split3[7]) + "," + t.discretize(last,11,split3[8]) + "," + t.discretize(last,12,split3[9]) + ",";
 													}
 													//just the class of n+1
 													split2 = lines2.get((lines2.size()-1)).split(",",-1);
-													String discret = t.discretize(13,split2[15]);
+													String discret = t.discretize(last,13,split2[15]);
 													patient += discret;
 													out.write(patient+'\n');
 

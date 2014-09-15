@@ -30,12 +30,13 @@ public class CreateDataNormalized {
 	public static void main(String[] args) {
 		CreateDataNormalized create = new CreateDataNormalized();
 		try {
-			steps = 5;
+			steps = 3;
 			create.diagnosticDataNotNormalized();//DONE
 			create.findMinMax();
+			
 			create.diagnosticData();//DONE
 			create.diagnosticData2();//DONE
-			
+
 			//
 			create.baseLineWithoutClass();//DONE
 			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
@@ -73,10 +74,13 @@ public class CreateDataNormalized {
 		BufferedReader in = new BufferedReader(new FileReader(diagnosisOutput+"DiagnoseData.csv"));
 		String line = in.readLine();
 		String[] split = line.split(",",-1);
+		System.out.print("\t");
 		for (int i = 0+skip; i < split.length-1; i++) {
 			mins.add(Double.MAX_VALUE);
 			maxs.add(Double.MIN_VALUE);
-		}		
+			System.out.print(split[i] + "\t");
+		}
+		System.out.println();
 		while((line = in.readLine()) != null){
 			split = line.split(",",-1);
 			for (int i = 0+skip; i < split.length-1; i++) {
@@ -92,9 +96,19 @@ public class CreateDataNormalized {
 			}
 		}
 		in.close();
+		System.out.print("MIN-\t");
+		for (int i = 0; i < mins.size(); i++) {
+			System.out.print(mins.get(i) + " \t");
+		}
+		System.out.println();
+		System.out.print("MAX-\t");
+		for (int i = 0; i < maxs.size(); i++) {
+			System.out.print(maxs.get(i) + "\t");
+		}
+		System.out.println();
 	}
 
-	private void diagnosticDataNotNormalized() throws IOException {
+	public void diagnosticDataNotNormalized() throws IOException {
 		System.out.println("Diagnostic data Not Normalized");
 		remove("ALSFRS_Data.csv", steps+"_ALSFRS_DATA.csv",path, steps);
 		remove("SVC_Data.csv", steps+"_SVC_DATA.csv",path, steps);

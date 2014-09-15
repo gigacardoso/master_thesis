@@ -37,7 +37,7 @@ public class Approach1Nominal {
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 	private HashMap<String, String> classes = new HashMap<String, String>();
 	
-	private static  int steps = 3;
+	private static  int steps = 5;
 	private  int folds = 10;
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
@@ -106,22 +106,37 @@ public class Approach1Nominal {
 //		a.ClassifyDiagnostic(new RandomForest());
 	}
 
+//	public void readClasses() throws IOException {
+//		BufferedReader in = new BufferedReader(new FileReader(path + "DiagnoseData.csv"));
+//		String[] split = in.readLine().split(",",-1);
+//		in.close();
+//		for(int var = 0; var < split.length-3 ; var++){
+//			String s = "{";
+//			int c=0;
+//			for(;c<CreateDataDiscret.buckets;c++){
+//				String d = "B"+ c;
+//				s += d + ",";
+//			}	
+//			String d = "B"+ c;
+//			s += d +",missing}";
+//			classes.put(split[var+2], s );
+//		}
+//	}
+	
 	public void readClasses() throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(path + "DiagnoseData.csv"));
 		String[] split = in.readLine().split(",",-1);
 		in.close();
 		for(int var = 0; var < split.length-3 ; var++){
 			String s = "{";
-			int c=0;
-			for(;c<CreateDataDiscret.buckets;c++){
-				String d = "B"+ c;
-				s += d + ",";
-			}	
-			String d = "B"+ c;
-			s += d +",missing}";
-			classes.put(split[var+2], s );
+			String out = CreateDataDiscret.getPossibleClasses(var);
+			s += out;
+			s += ",missing}";
+			String ver = split[var+2];
+			classes.put(ver, s );
 		}
 	}
+	
 	private void changeClassesInAttributes(String file,String outFile) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(path + file));
 		BufferedWriter out = new BufferedWriter(new FileWriter(path + outFile));
@@ -154,6 +169,7 @@ public class Approach1Nominal {
 		try{
 			int o = 0;
 			for(int index:demoIndex){
+				System.out.println("Demo"+index);
 				CSVLoader svcLoader = new CSVLoader();
 				svcLoader.setSource(new File(path+"approach1_Demo"+index+"_"+steps+".csv"));
 				Instances svcData = svcLoader.getDataSet();
@@ -314,6 +330,9 @@ public class Approach1Nominal {
 					count++;
 					correct.put(examsSVC[i]+"_SVC",count);
 				}else{
+//					System.out.println(examsSVC[i]+"_SVC");
+//					System.out.println(ID);
+//					System.out.println(e.get(ID));
 					if(split[1+examsIndexes.indexOf(examsSVC[i]+"_SVC")].equals("") || e.get(ID).equals("") ){
 						Integer count = missing.get(examsSVC[i]+"_SVC");
 						count++;
@@ -666,6 +685,7 @@ public class Approach1Nominal {
 		try{
 			int o = 0;
 			for(int index:vitalsIndex){
+				System.out.println("Vitals"+index);
 				CSVLoader loader = new CSVLoader();
 				loader.setSource(new File(path+"approach1_Vitals"+index+"_"+steps+".csv"));
 				Instances svcData = loader.getDataSet();
@@ -723,9 +743,11 @@ public class Approach1Nominal {
 	private  void predictSVCNominal(Classifier c) throws IOException {
 		int[] svcIndex = {2,5,6,7};
 		HashMap<String,HashMap<Double,String>> indexes = getIndexes(svcIndex,"SVC");
+		System.out.println(indexes.get(2+""));
 		try{
 			int o = 0;
 			for(int index:svcIndex){
+				System.out.println("SVC"+index);
 				CSVLoader svcLoader = new CSVLoader();
 				svcLoader.setSource(new File(path+"approach1_SVC"+index+"_"+steps+".csv"));
 				Instances svcData = svcLoader.getDataSet();
@@ -765,7 +787,12 @@ public class Approach1Nominal {
 						Double d = cModel.classifyInstance(i);
 						//						System.out.println("\t-> "+d);
 						String ins = (i.toString().split(","))[0];
-						svc.put(Integer.parseInt(ins) , indexes.get(index+"").get(d));
+						String s = indexes.get(index+"").get(d);
+						if(Integer.parseInt(ins)== 533 && index == 2){
+							 @SuppressWarnings("unused")
+								int xos = 02;
+						}
+						svc.put(Integer.parseInt(ins) , s);
 					}
 					svcAll.put(index, svc);
 				}

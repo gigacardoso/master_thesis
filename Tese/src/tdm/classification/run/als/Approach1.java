@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 import tdm.classification.createData.ALS.CreateData;
-import tdm.classification.createData.ALS.CreateDataDiscret;
 import tdm.classification.utils.DefaultHashMap;
 import tdm.classification.utils.Utils;
 import weka.classifiers.Classifier;
@@ -34,8 +33,8 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> svcAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
-	private HashMap<String, String> classes = new HashMap<String, String>();
-	private static  int steps = 5;
+//	private HashMap<String, String> classes = new HashMap<String, String>();
+	private static  int steps = 3;
 	private  int folds = 10;
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
@@ -93,35 +92,35 @@ public class Approach1 {
 		matrix = a.buildConfussionMatrix("AdaBoost");
 		u.metrics(matrix,classes_simb,"ALS",j,"Approach1", steps, "AdaBoost");
 
-		a.writeTimes();
+//		a.writeTimes();
 		System.out.println("------------------\tDiagnostic\t------------------");
 //			a.ClassifyDiagnostic(new NaiveBayes());
-			a.ClassifyDiagnostic(new J48());
+//			a.ClassifyDiagnostic(new J48());
 //			a.ClassifyDiagnostic(new AdaBoostM1());
 //			a.ClassifyDiagnostic(new Logistic());
 //			a.ClassifyDiagnostic(new RandomForest());
 	}
 
-	public void readClasses() throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(path + "DiagnoseData.csv"));
-		String[] split = in.readLine().split(",",-1);
-		in.close();
-		DecimalFormat df = new DecimalFormat("#.##");
-		for(int var = 0; var < split.length-3 ; var++){
-			float min = CreateDataDiscret.mins[var];
-			String s = "{";
-			int c=0;
-			for(;c<CreateDataDiscret.buckets-1;c++){
-				String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
-				d = d.replace(",",".");
-				s += d + ",";
-			}	
-			String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
-			d = d.replace(",",".");
-			s += d + "}";
-			classes.put(split[var+2], s );
-		}
-	}
+//	public void readClasses() throws IOException {
+//		BufferedReader in = new BufferedReader(new FileReader(path + "DiagnoseData.csv"));
+//		String[] split = in.readLine().split(",",-1);
+//		in.close();
+//		DecimalFormat df = new DecimalFormat("#.##");
+//		for(int var = 0; var < split.length-3 ; var++){
+//			float min = CreateDataDiscret.mins[var];
+//			String s = "{";
+//			int c=0;
+//			for(;c<CreateDataDiscret.buckets-1;c++){
+//				String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
+//				d = d.replace(",",".");
+//				s += d + ",";
+//			}	
+//			String d = df.format(min+(c*CreateDataDiscret.divider[var]))+ "-" + df.format(min+((c+1)*CreateDataDiscret.divider[var]));
+//			d = d.replace(",",".");
+//			s += d + "}";
+//			classes.put(split[var+2], s );
+//		}
+//	}
 	
 	private void writeTimes() throws IOException {
 		BufferedWriter out = new BufferedWriter(new FileWriter(path+"AP1_ALStimes_"+steps+".csv"));

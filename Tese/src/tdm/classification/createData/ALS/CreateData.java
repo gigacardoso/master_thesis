@@ -27,13 +27,13 @@ public class CreateData {
 	public static void main(String[] args) {
 		CreateData create = new CreateData();
 		try {
-			steps = 5;
+			steps = 3;
 			create.diagnosticData();
-			create.diagnosticData2();
+//			create.diagnosticData2();
 //			
 			create.alternativeApproach(steps);
 			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-			aa.createData(steps);
+			//aa.createData(steps);
 			aa.createDataNoClass(steps);
 			create.approach1(steps);
 			Approach1CreateData a1 = new Approach1CreateData(approach1Output, steps); 
@@ -61,7 +61,6 @@ public class CreateData {
 			DeleteFiles(cam + "Approach1Data");
 			DeleteFiles(cam + "DiagnosisData");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -102,7 +101,6 @@ public class CreateData {
 			saver.writeBatch();
 			loader = new CSVLoader();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -116,11 +114,12 @@ public class CreateData {
 
 	}
 	
-	// creates diagnosis data only with patients that have the required (steps) time points
-	// diagnosis data only has steps-1 timepoins
-	// diagnosis real has the last time point
+//	// creates diagnosis data only with patients that have the required (steps) time points
+//	// diagnosis data only has steps-1 timepoins
+//	// diagnosis real has the last time point
 	private  void diagnosticData() throws IOException {
 		System.out.println("Diagnostic data");
+		//TODO
 		remove("ALSFRS_Data.csv", steps+"_ALSFRS_DATA.csv",path, steps);
 		remove("SVC_Data.csv", steps+"_SVC_DATA.csv",path, steps);
 		remove("Vitals_Data.csv", steps+"_Vitals_DATA.csv",path, steps);

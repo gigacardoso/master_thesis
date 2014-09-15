@@ -14,10 +14,14 @@ import java.util.Set;
 public class AverageMetrics {
 
 	private static String path = "C:\\Users\\Daniel\\Dropbox\\Bolsa\\Dissertacao\\Metrics\\";
-	private static String als = path + "ALS\\";
+	private static String als = path + "ALS\\Linear\\";
+	private static String als_j48 = path + "ALS\\J48\\";
+	private static String als_hmm = path + "ALS\\HMM\\";
+	private static String als_base = path + "ALS\\Baseline\\";
 	private static String hmm = path + "Hepatitis\\HMM\\";
 	private static String j48 = path + "Hepatitis\\J48\\";
 	private static String log = path + "Hepatitis\\Logistic\\";
+	private static String base = path + "Hepatitis\\Baseline\\";
 	private static String averaged = path + "Averaged\\";
 	private static String unaveraged = path + "Unaveraged\\";
 	private String graph = averaged + "Graph\\";
@@ -25,30 +29,35 @@ public class AverageMetrics {
 	private static int als_classes = 4;
 	private static int hep_classes = 5;
 	private int steps = 3;
-		
+
 	public static void main(String[] args) {
 		try {
 			AverageMetrics a = new AverageMetrics();
-			a.average(als,"ALS", als_classes);
-			a.average(hmm,"Hepatitis_HMM", hep_classes);
-			a.average(j48,"Hepatitis_J48", hep_classes);
-			a.average(log,"Hepatitis_Logistic", hep_classes);
-			a.graphs(averaged);
-			a.unaveragedGraph(hmm, hep_classes);
+			//			a.average(als,"ALS_Linear", als_classes);
+			//			a.average(als_j48,"ALS_J48", als_classes);
+			//			a.average(als_hmm,"ALS_HMM", als_classes);
+			//			a.average(hmm,"Hepatitis_HMM", hep_classes);
+			//			a.average(j48,"Hepatitis_J48", hep_classes);
+			//			a.average(log,"Hepatitis_Logistic", hep_classes);
+			//			a.graphs(averaged);
+			//			a.unaveragedGraph(hmm, hep_classes);
+			a.unaveragedGraph(als_hmm, als_classes);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void unaveragedGraph(String input, int hep_classes) throws NumberFormatException, IOException {
 		File file = new File(input);
 		String[] myFiles;
-		String lastapp = null;
-		String lasttype = null;
-		File lastFile = null;
+		//		String lastapp = null;
+		//		String lasttype = null;
+		//		String laststep = null;
+		//		File lastFile = null;
 		int offset = 0;
+		Set<String> done = new HashSet<String>();
 		HashMap<String,ArrayList<Double>> values = new HashMap<String,ArrayList<Double>>();
-		ArrayList<String> techs = new ArrayList<String>();
+		Set<String> techs = new HashSet<String>();
 		if (file.isDirectory()) {
 			myFiles = file.list();
 			for (int i = 0; i < myFiles.length; i++) {
@@ -57,52 +66,67 @@ public class AverageMetrics {
 					String name = myFile.getName();
 					String[] splited = name.split("_");
 					String type = splited[0];
-					if(!type.equals("ALS")){
-						offset = 1;
-						type += "_" + splited[1];
-					}else{
-						offset = 0;
-					}
+					offset = 1;
+					type += "_" + splited[1];
 					String approach = splited[1+offset];
 					String tech = splited[2+offset].split("\\.")[0];
-					BufferedReader in = new BufferedReader(new FileReader(myFile));
-					for (int j = 0; j < 6; j++) {
-						in.readLine();
-					}
-					if(approach.equals(lastapp)){
-						values = saveValues(in, tech, values);
-						techs.add(tech);
+					String step = splited[3+offset];
+					if(done.contains(approach+"_"+step)){
+						continue;
 					}else{
-						if(lastapp != null){
-							printGraph2(lasttype,lastapp,techs ,values, lastFile);
+						for (int i1 = 0; i1 < myFiles.length; i1++) {
+							File newfile = new File(file, myFiles[i1]);
+//							if (newfile == myFile) {
+//								continue;
+//							}
+							if (!newfile.isDirectory()) {
+								String newname = newfile.getName();
+								String[] newsplited = newname.split("_");
+								String newtype = newsplited[0];
+								offset = 1;
+								newtype += "_" + newsplited[1];
+								String newapproach = newsplited[1+offset];
+								String newtech = newsplited[2+offset].split("\\.")[0];
+								String newstep = newsplited[3+offset];
+								if(approach.equals(newapproach) && step.equals(newstep)){
+									BufferedReader in = new BufferedReader(new FileReader(newfile));
+									for (int j = 0; j < 6; j++) {
+										in.readLine();
+									}
+									values = saveValues(in, newtech, values);
+									techs.add(newtech);
+									in.close();
+								}
+							}
 						}
-						lastapp = approach;
-						lasttype = type;
-						techs = new ArrayList<String>();
-						techs.add(tech);
-						values = saveValues(in, tech, values);
+						printGraph2(type,approach,techs ,values, myFile, step);
+						values= new HashMap<String, ArrayList<Double>>();
+						techs = new HashSet<String>();
+						done.add(approach+"_"+step);
 					}
-					lastFile = myFile;
-					in.close();
 				}
 			}
-			printGraph2(lasttype,lastapp,techs, values, lastFile);
 		}
 	}
 
 	private void printGraph2(String type, String lastapp,
-			ArrayList<String> techs, HashMap<String, ArrayList<Double>> values,
-			File lastFile) throws IOException {
+			Set<String> techs, HashMap<String, ArrayList<Double>> values,
+			File lastFile, String step) throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(lastFile));
 		for (int j = 0; j < 6; j++) {
 			in.readLine();
 		}
-		BufferedWriter out = new BufferedWriter(new FileWriter(graph2 + type + "_" +lastapp + ".csv"));
+		BufferedWriter out = new BufferedWriter(new FileWriter(graph2 + type + "_" +lastapp+"_"+step+".csv"));
 		String line;
 		int index = 0;
 		String tecnicas = ",";
+		String[] techsarray = new String[techs.size()]; 
+		Object[] o = techs.toArray();
+		for (int i = 0; i < o.length; i++) {
+			techsarray[i] = (String) o[i];
+		}
 		for (int i = 0; i < techs.size(); i++) {
-			tecnicas += techs.get(i) + ",";
+			tecnicas += techsarray[i] + ",";
 		}
 		tecnicas = tecnicas.substring(0,tecnicas.length()-1);
 		String classe = null;
@@ -115,7 +139,7 @@ public class AverageMetrics {
 				metrics.add(split[0]);
 				String output = classe+",";
 				for (int i = 0; i < techs.size(); i++) {
-					output += values.get(techs.get(i)).get(index) + "%,";
+					output += values.get(techsarray[i]).get(index) + "%,";
 				}
 				output = output.substring(0,output.length()-1);
 				HashMap<String, String> metric = new_values.get(split[0]);
@@ -130,7 +154,7 @@ public class AverageMetrics {
 				classes.add(classe);
 			}
 		}
-		
+
 		for(String m: metrics){
 			out.write(m+"\n");
 			out.write(tecnicas + "\n");
@@ -160,12 +184,12 @@ public class AverageMetrics {
 					String name = myFile.getName();
 					String[] splited = name.split("_");
 					String type = splited[0];
-					if(!type.equals("ALS")){
-						offset = 1;
-						type += "_" + splited[1];
-					}else{
-						offset = 0;
-					}
+					//					if(!type.equals("ALS")){
+					offset = 1;
+					type += "_" + splited[1];
+					//					}else{
+					//						offset = 0;
+					//					}
 					String approach = splited[1+offset];
 					String tech = splited[2+offset].split("\\.")[0];
 					BufferedReader in = new BufferedReader(new FileReader(myFile));
@@ -227,7 +251,7 @@ public class AverageMetrics {
 				classes.add(classe);
 			}
 		}
-		
+
 		for(String m: metrics){
 			out.write(m+"\n");
 			out.write(tecnicas + "\n");
@@ -262,7 +286,7 @@ public class AverageMetrics {
 		String lasttech = null;
 		File lastFile = null;
 		int offset = 0;
-		if(!type.equals("ALS")){
+		if(!type.equals("ALS_Linear")){
 			offset = 1;
 		}				
 		ArrayList<Double> sums = new ArrayList<Double>(); 
@@ -275,6 +299,9 @@ public class AverageMetrics {
 					String[] splited = name.split("_");
 					String approach = splited[1+offset];
 					String tech = splited[2+offset];
+					if(tech.equals("Nominal")){
+						tech = splited[3+offset];
+					}
 					BufferedReader in = new BufferedReader(new FileReader(myFile));
 					for (int j = 0; j < 6; j++) {
 						in.readLine();

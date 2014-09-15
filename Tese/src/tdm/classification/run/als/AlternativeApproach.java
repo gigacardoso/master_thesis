@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Random;
 
+import tdm.classification.utils.Utils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -27,7 +28,7 @@ public class AlternativeApproach {
 		System.out.println("------------------\tWITHOUT CLASS\t------------------");
 		aa.Classify(new NaiveBayes(), folds, "approach1_NoClass_"+steps);
 		aa.Classify(new J48(), folds, "approach1_NoClass_"+steps);
-		aa.Classify(new AdaBoostM1(), folds, "approach1_NoClass_"+steps);
+//		aa.Classify(new AdaBoostM1(), folds, "approach1_NoClass_"+steps);
 		aa.Classify(new Logistic(), folds, "approach1_NoClass_"+steps);
 		aa.Classify(new RandomForest(), folds, "approach1_NoClass_"+steps);
 	}
@@ -47,35 +48,26 @@ public class AlternativeApproach {
 			//				System.out.println(cModel.toString());
 
 			//Get the confusion matrix
-//			double[][] matrix = eval.confusionMatrix();
+			double[][] m = eval.confusionMatrix();
 			System.out.println("\n\t\t"+ classifier.getClass().toString());
 			System.out.println(strSummary);
-			//			String[] val = {"{36-48}","{24-36}","{12-24}","{0-12}"};
-			//			System.out.println("\t\t{36-48}\t{24-36}\t{12-24}\t{0-12}");
-			//			for(int i=0; i<4;i++){
-			//				System.out.print(val[i] + "\t|");
-			//				for(int j= 0;j<4;j++){
-			//					System.out.print(matrix[i][j]+ "\t\t|");
-			//				}
-			//				System.out.println();
-			//			}
-			//			double tru = 0;
-			//			double fal = 0;
-			//			double bad = 0;
-			//			for(int i=0; i<4;i++){
-			//				for(int j= 0;j<4;j++){
-			//					if(i==j){
-			//						tru +=matrix[i][j]; 
-			//					}else{
-			//						bad +=matrix[i][j];
-			//					}				
-			//					fal += matrix[i][j];
-			//				}
-			//			}
-			//			double accuracy = tru/fal;
-			//			double errorRate = bad/fal;
-			//						System.out.println("\nCorrectly Classified Instances\t\t"+ tru +"\t\t" + (accuracy*100) + " %");
-			//						System.out.println("Inorrectly Classified Instances\t\t"+ bad +"\t\t" + (errorRate*100) + " %");
+			String s = eval.toMatrixString();
+			String[] split = s.split("=");
+			String[] classes_simb = new String[4];
+			for (int i = 0; i < split.length-7; i++) {
+				String tmp = split[7+i].split(" ")[1];
+				classes_simb[i] = tmp.substring(0, tmp.length()-1);
+			}
+			Utils u = new Utils();
+			String[] splitt = classifier.getClass().toString().split("\\.");
+			String classs = splitt[splitt.length-1];
+			int[][] matrix = new int[m.length][m[0].length];
+			for (int i = 0; i < m.length; i++) {
+				for (int j = 0; j < m[0].length; j++) {
+					matrix[i][j] = (int) m[i][j];
+				}
+			}
+			u.metrics(matrix,classes_simb,"ALS",null,"BaselineMulti", steps, classs);
 		}
 		catch (Exception e){
 			e.printStackTrace();

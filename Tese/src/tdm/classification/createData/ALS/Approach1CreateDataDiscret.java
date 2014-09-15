@@ -11,10 +11,17 @@ public class Approach1CreateDataDiscret {
 
 	private String approach1Output;
 	private int steps;
+	private CreateDataDiscret t;
 	
 	public Approach1CreateDataDiscret(String output, int steps) {
 		approach1Output= output;
 		this.steps = steps;
+		try {
+			t = new CreateDataDiscret();
+			t.findMinsDivider();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void createDataSVC(int stp) throws IOException{
@@ -41,20 +48,19 @@ public class Approach1CreateDataDiscret {
 		String att7 = split[0]+ ",";
 		//		patient += ",";
 		for(int i=0 ; i < steps-1; i++){
-			att2 += split[2]+"_"+i + ",";
-			att5 += split[5]+"_"+i + ",";
-			att6 += split[6]+"_"+i + ",";
-			att7 += split[7]+"_"+i + ",";
+			att2 += split[2].replace(' ', '_').replace('%', 'P')+"_"+i + ",";
+			att5 += split[5].replace(' ', '_')+"_"+i + ",";
+			att6 += split[6].replace(' ', '_')+"_"+i + ",";
+			att7 += split[7].replace(' ', '_')+"_"+i + ",";
 		}
-		att2 += split[2]+"_"+(steps-1);
-		att5 += split[5]+"_"+(steps-1);
-		att6 += split[6]+"_"+(steps-1);
-		att7 += split[7]+"_"+(steps-1);
+		att2 += split[2].replace(' ', '_').replace('%', 'P')+"_"+(steps-1);
+		att5 += split[5].replace(' ', '_')+"_"+(steps-1);
+		att6 += split[6].replace(' ', '_')+"_"+(steps-1);
+		att7 += split[7].replace(' ', '_')+"_"+(steps-1);
 		outSVC2.write(att2+'\n');
 		outSVC5.write(att5+'\n');
 		outSVC6.write(att6+'\n');
 		outSVC7.write(att7+'\n');
-		CreateDataDiscret t = new CreateDataDiscret();
 
 		//just the class of n+1
 		int last = 0;
@@ -76,16 +82,16 @@ public class Approach1CreateDataDiscret {
 
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += t.discretize(3,split[2]) + ",";
-					att5 += t.discretize(4,split[5]) + ",";
-					att6 += t.discretize(5,split[6])+ ",";
-					att7 += t.discretize(6,split[7]) + ",";
+					att2 += t.discretize(last,3,split[2]) + ",";
+					att5 += t.discretize(last,4,split[5]) + ",";
+					att6 += t.discretize(last,5,split[6])+ ",";
+					att7 += t.discretize(last,6,split[7]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += t.discretize(3,split[2]);
-				att5 += t.discretize(4,split[5]);
-				att6 += t.discretize(5,split[6]);
-				att7 += t.discretize(6,split[7]);
+				att2 += t.discretize(last,3,split[2]);
+				att5 += t.discretize(last,4,split[5]);
+				att6 += t.discretize(last,5,split[6]);
+				att7 += t.discretize(last,6,split[7]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -110,12 +116,10 @@ public class Approach1CreateDataDiscret {
 		outSVC6.close();
 		outSVC7.close();
 		
-		CreateDataDiscret c = new CreateDataDiscret();
-		
-		c.CSV2arff(approach1Output+File.separator,"approach1_SVC2_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_SVC5_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_SVC6_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_SVC7_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_SVC2_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_SVC5_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_SVC6_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_SVC7_"+steps);
 	}
 
 	public void createDataVitals(int stp) throws IOException{
@@ -145,27 +149,25 @@ public class Approach1CreateDataDiscret {
 		String att9 = split[0]+ ",";
 		//		patient += ",";
 		for(int i=0 ; i < steps-1; i++){
-			att2 += split[2]+"_"+i + ",";
-			att3 += split[3]+"_"+i + ",";
-			att6 += split[6]+"_"+i + ",";
-			att7 += split[7]+"_"+i + ",";
-			att8 += split[8]+"_"+i + ",";
-			att9 += split[9]+"_"+i + ",";
+			att2 += split[2].replace(' ', '_')+"_"+i + ",";
+			att3 += split[3].replace(' ', '_')+"_"+i + ",";
+			att6 += split[6].replace(' ', '_')+"_"+i + ",";
+			att7 += split[7].replace(' ', '_')+"_"+i + ",";
+			att8 += split[8].replace(' ', '_')+"_"+i + ",";
+			att9 += split[9].replace(' ', '_')+"_"+i + ",";
 		}
-		att2 += split[2]+"_"+(steps-1);
-		att3 += split[3]+"_"+(steps-1);
-		att6 += split[6]+"_"+(steps-1);
-		att7 += split[7]+"_"+(steps-1);
-		att8 += split[8]+"_"+(steps-1);
-		att9 += split[9]+"_"+(steps-1);
+		att2 += split[2].replace(' ', '_')+"_"+(steps-1);
+		att3 += split[3].replace(' ', '_')+"_"+(steps-1);
+		att6 += split[6].replace(' ', '_')+"_"+(steps-1);
+		att7 += split[7].replace(' ', '_')+"_"+(steps-1);
+		att8 += split[8].replace(' ', '_')+"_"+(steps-1);
+		att9 += split[9].replace(' ', '_')+"_"+(steps-1);
 		outSVC2.write(att2+'\n');
 		outSVC5.write(att3+'\n');
 		outSVC6.write(att6+'\n');
 		outSVC7.write(att7+'\n');
 		outSVC8.write(att8+'\n');
 		outSVC9.write(att9+'\n');
-		
-		CreateDataDiscret t = new CreateDataDiscret();
 		
 
 		int last = 0;
@@ -188,20 +190,20 @@ public class Approach1CreateDataDiscret {
 				 att9 = last+ ",";
 				for(int i=0 ; i < steps-1; i++){
 					split = lines1.get(((lines1.size()-steps)+i)).split(",",-1);
-					att2 += t.discretize(7,split[2]) + ",";
-					att3 += t.discretize(8,split[3]) + ",";
-					att6 += t.discretize(9,split[6]) + ",";
-					att7 += t.discretize(10,split[7]) + ",";
-					att8 += t.discretize(11,split[8]) + ",";
-					att9 += t.discretize(12,split[9]) + ",";
+					att2 += t.discretize(last,7,split[2]) + ",";
+					att3 += t.discretize(last,8,split[3]) + ",";
+					att6 += t.discretize(last,9,split[6]) + ",";
+					att7 += t.discretize(last,10,split[7]) + ",";
+					att8 += t.discretize(last,11,split[8]) + ",";
+					att9 += t.discretize(last,12,split[9]) + ",";
 				}
 				split = lines1.get((lines1.size()-1)).split(",",-1);
-				att2 += t.discretize(7,split[2]);
-				att3 += t.discretize(8,split[3]);
-				att6 += t.discretize(9,split[6]);
-				att7 += t.discretize(10,split[7]);
-				att8 += t.discretize(11,split[8]);
-				att9 += t.discretize(12,split[9]);
+				att2 += t.discretize(last,7,split[2]);
+				att3 += t.discretize(last,8,split[3]);
+				att6 += t.discretize(last,9,split[6]);
+				att7 += t.discretize(last,10,split[7]);
+				att8 += t.discretize(last,11,split[8]);
+				att9 += t.discretize(last,12,split[9]);
 				if(!split[2].isEmpty()){
 					outSVC2.write(att2+'\n');
 				}
@@ -234,14 +236,13 @@ public class Approach1CreateDataDiscret {
 		outSVC8.close();
 		outSVC9.close();
 		
-		CreateDataDiscret c = new CreateDataDiscret();
 		
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals2_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals3_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals6_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals7_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals8_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Vitals9_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals2_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals3_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals6_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals7_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals8_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Vitals9_"+steps);
 		
 	}
 	
@@ -274,13 +275,13 @@ public class Approach1CreateDataDiscret {
 		String att6 = split[0]+ ",";
 		//		patient += ",";
 		for(int i=0 ; i < steps-1; i++){
-			att2 += split[1]+"_"+i + ",";
-			att3 += split[2]+"_"+i + ",";
-			att6 += split[3]+"_"+i + ",";
+			att2 += split[1].replace(' ', '_')+"_"+i + ",";
+			att3 += split[2].replace(' ', '_')+"_"+i + ",";
+			att6 += split[3].replace(' ', '_')+"_"+i + ",";
 		}
-		att2 += split[1]+"_"+(steps-1);
-		att3 += split[2]+"_"+(steps-1);
-		att6 += split[3]+"_"+(steps-1);
+		att2 += split[1].replace(' ', '_')+"_"+(steps-1);
+		att3 += split[2].replace(' ', '_')+"_"+(steps-1);
+		att6 += split[3].replace(' ', '_')+"_"+(steps-1);
 		outSVC2.write(att2+'\n');
 		outSVC5.write(att3+'\n');
 		outSVC6.write(att6+'\n');
@@ -333,11 +334,9 @@ public class Approach1CreateDataDiscret {
 		outSVC5.close();
 		outSVC6.close();
 		
-		CreateDataDiscret c = new CreateDataDiscret();
-		
-		c.CSV2arff(approach1Output+File.separator,"approach1_Demo1_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Demo2_"+steps);
-		c.CSV2arff(approach1Output+File.separator,"approach1_Demo3_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Demo1_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Demo2_"+steps);
+		t.CSV2arff(approach1Output+File.separator,"approach1_Demo3_"+steps);
 	}
 
 }
