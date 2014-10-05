@@ -36,7 +36,7 @@ public class Approach2 {
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
-	private static int steps = 5;
+	private static int steps = 3;
 	private  int folds = 10;
 
 
@@ -437,7 +437,7 @@ public class Approach2 {
 
 	private  void getHeight() throws IOException {
 
-		BufferedReader inVitals = new BufferedReader(new FileReader(path+steps+"_VITALS_DATA.csv"));
+		BufferedReader inVitals = new BufferedReader(new FileReader(path+"DiagnoseData.csv"));
 		String line1 = inVitals.readLine();
 
 		String last = null;
@@ -445,13 +445,13 @@ public class Approach2 {
 			String[] split = line1.split(",",-1);
 			if(null == last){
 				last = split[0];
-				heights.put(last, split[4]);
+				heights.put(last, split[3]);
 			}else{
 				if(last.equals(split[0])){
 					continue;
 				}else {
 					last = split[0];
-					heights.put(last, split[4]);
+					heights.put(last, split[3]);
 				}
 			}
 		}

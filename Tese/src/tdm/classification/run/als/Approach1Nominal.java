@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import tdm.classification.createData.ALS.CreateData;
 import tdm.classification.createData.ALS.CreateDataDiscret;
@@ -47,11 +50,54 @@ public class Approach1Nominal {
 	static long start,vitals,SVC,Demo,predictions,startClassification, endNaive, endRF,endDT, endAdaboost, endLogistic;
 	public static void main(String[] args){
 		try {
-			nominal();
+			//nominal();
+//			printallseparateclasses();
+			printallclassestogether();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void printallclassestogether() {
+		String[] exams = {"Demo2","Demo3","SVC2","SVC5","SVC6","SVC7","Vitals2","Vitals3","Vitals6","Vitals7","Vitals8","Vitals9"};
+		String s = "c(";
+		Set<String> values = new HashSet<String>();
+		values.add("Female");
+		values.add("Male");
+		for(int var = 0; var < exams.length ; var++){
+			String out = CreateDataDiscret.getPossibleClasses(var);
+			String[] d = out.split(",",-1);
+			for (int i = 0; i < d.length; i++) {
+				values.add(d[i]);
+			}
+		}
+		values.add("missing");
+		values.add("$");
+		List<String> sorted = Utils.asSortedList(values);
+		for (String val:sorted) {
+			s += "\"" + val +"\",";
+		}
+		s = s.substring(0,s.length()-1);
+		s += ")";
+		System.out.println("vals <- "+s);
+	}
+
+	private static void printallseparateclasses() {
+		String[] exams = {"Demo2","Demo3","SVC2","SVC5","SVC6","SVC7","Vitals2","Vitals3","Vitals6","Vitals7","Vitals8","Vitals9"};
+		for(int var = 0; var < exams.length ; var++){
+			String s = "c(";
+			String out = CreateDataDiscret.getPossibleClasses(var);
+			String[] d = out.split(",",-1);
+			for (int i = 0; i < d.length; i++) {
+				s += "\"" + d[i] +"\",";
+			}
+			s = s.substring(0,s.length()-1);
+			s += ",\"missing\")";
+			System.out.println("\tif(exam == \""+ exams[var] +"\"){");
+			System.out.println("\t\tvals <- "+s);
+			System.out.println("\t}");
+		}
 	}
 
 	private static void nominal() throws IOException, FileNotFoundException,

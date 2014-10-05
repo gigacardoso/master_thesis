@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import weka.classifiers.Classifier;
 import weka.core.Instances;
@@ -14,7 +17,13 @@ import weka.core.converters.CSVLoader;
 public class Utils {
 
 	private String path = "C:\\Users\\Daniel\\Dropbox\\Bolsa\\Dissertacao\\Metrics\\";
-
+	
+	public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+	  List<T> list = new ArrayList<T>(c);
+	  java.util.Collections.sort(list);
+	  return list;
+	}	
+	
 	public void CSV2arff(String path,String str){ 
 		// load CSV
 		CSVLoader loader = new CSVLoader();

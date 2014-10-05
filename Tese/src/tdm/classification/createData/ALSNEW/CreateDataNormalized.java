@@ -1,4 +1,4 @@
-package tdm.classification.createData.ALS;
+package tdm.classification.createData.ALSNEW;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +17,7 @@ import weka.core.converters.CSVLoader;
 
 public class CreateDataNormalized {
 
-	public  String path = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "ToUse"+ File.separator;
+	public static  String path = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "ToUse"+ File.separator;
 	public static  String alternativeOutput = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "AlternativeData"+ File.separator;
 	public static  String approach1Output = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "Approach1Data"+ File.separator;
 	public static  String diagnosisOutput = "C:" + File.separator + "PROACT_2013_08_27_ALL_FORMS" + File.separator + "DiagnosisData"+ File.separator;
@@ -39,9 +39,9 @@ public class CreateDataNormalized {
 
 			//
 			create.baseLineWithoutClass();//DONE
-//			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
-//			create.alternativeApproach(steps);
-//			aa.createDataNoClass(steps);//DONE
+			AlternativeApproachCreateData aa = new AlternativeApproachCreateData(alternativeOutput,steps);
+			create.alternativeApproach(steps);
+			aa.createDataNoClass(steps);//DONE
 
 			create.approach1(steps);
 			Approach1CreateDataNormalized a1 = new Approach1CreateDataNormalized(approach1Output, steps, mins, maxs); //DONE
@@ -53,7 +53,7 @@ public class CreateDataNormalized {
 			a2.createData(steps);//DONE
 
 
-			MoveData move = new MoveData(alternativeOutput,approach1Output,diagnosisOutput,steps);
+			MoveData move = new MoveData(path,alternativeOutput,approach1Output,diagnosisOutput,steps);
 			move.MoveAllData(steps, false);
 			//			create.CleanData();
 

@@ -36,8 +36,8 @@ public class Approach2HMM {
 	private static String[] examsHMM = {"Demo1","Demo2","Demo3","SVC2","SVC5","SVC6","SVC7","Vitals2","Vitals3","Vitals6","Vitals7","Vitals8","Vitals9"};
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
-	static ArrayList<String> accuracies = new ArrayList<String>();
-	private static int steps = 3;
+	static HashMap<String, String> accuracies;
+	private static int steps = 6;
 
 	public static void main(String[] args){
 		try {
@@ -55,26 +55,28 @@ public class Approach2HMM {
 		a.buildDataWithHMMPredictionsSorted();
 		Classifier j = null;
 		Utils u = new Utils();
-		accuracies = new ArrayList<String>();
+		accuracies =  new HashMap<String,String>();
 		a.ClassifyDataNominal(new NaiveBayes());
 		int[][] matrix = a.buildConfussionMatrix("Naive Bayes");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(4,10)", steps, "NaiveBayes");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(6,1)", steps, "NaiveBayes");
 		a.ClassifyDataNominal(new J48());
 		matrix = a.buildConfussionMatrix("J48");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(4,10)", steps, "J48");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(6,1)", steps, "J48");
 		a.ClassifyDataNominal(new AdaBoostM1());
 		matrix = a.buildConfussionMatrix("AdaBoost");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(4,10)", steps, "AdaBoost");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(6,1)", steps, "AdaBoost");
 		a.ClassifyDataNominal(new Logistic());
 		matrix = a.buildConfussionMatrix("Logistic");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(4,10)", steps, "Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(6,1)", steps, "Logistic");
 		a.ClassifyDataNominal(new RandomForest());
 		matrix = a.buildConfussionMatrix("RandomForest");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(4,10)", steps, "RandomForest");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach2(6,1)", steps, "RandomForest");
 
-		for (String s : accuracies) {
-			System.out.println(s);
-		}
+		System.out.println(accuracies.get("Naive Bayes"));
+		System.out.println(accuracies.get("J48"));
+		System.out.println(accuracies.get("RandomForest"));
+		System.out.println(accuracies.get("Logistic"));
+		System.out.println(accuracies.get("AdaBoost"));
 	}
 	
 	private  void ClassifyDataNominal(Classifier classifier) throws Exception {
@@ -336,6 +338,9 @@ public class Approach2HMM {
 		DecimalFormat df = new DecimalFormat("#.#####");
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
+		
+		accuracies.put(method,df.format(accuracy*100) + " %");
+		
 		return matrix;
 	}
 

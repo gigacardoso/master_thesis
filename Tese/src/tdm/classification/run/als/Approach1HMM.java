@@ -35,9 +35,9 @@ public class Approach1HMM {
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 	private static String[] examsHMM = {"Demo1","Demo2","Demo3","SVC2","SVC5","SVC6","SVC7","Vitals2","Vitals3","Vitals6","Vitals7","Vitals8","Vitals9"};
 	private  HashMap<String,DefaultHashMap<String,String>> predictionsHMM = new HashMap<String,DefaultHashMap<String,String>>();	
-	static ArrayList<String> accuracies = new ArrayList<String>();
+	static HashMap<String, String> accuracies;
 	private static  int steps;
-	
+
 	public static void main(String[] args){
 		try {
 			hmm();
@@ -46,35 +46,38 @@ public class Approach1HMM {
 		}
 
 	}
-	
+
 	private static void hmm() throws IOException, FileNotFoundException,
-			Exception {
+	Exception {
 		steps = 5;
 		Approach1HMM a = new Approach1HMM();
 		a.evaluatePredictionsHMM();
 		a.buildDataWithHMMPredictionsSorted();
 		Classifier j = null;
 		Utils u = new Utils();
-		accuracies = new ArrayList<String>();
+		accuracies =  new HashMap<String,String>();
 		a.ClassifyDataNominal(new NaiveBayes());
 		int[][] matrix = a.buildConfussionMatrix("Naive Bayes");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(4,10)", steps, "NaiveBayes");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(5,1)", steps, "NaiveBayes");
 		a.ClassifyDataNominal(new J48());
 		matrix = a.buildConfussionMatrix("J48");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(4,10)", steps, "J48");
-		a.ClassifyDataNominal(new AdaBoostM1());
-		matrix = a.buildConfussionMatrix("AdaBoost");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(4,10)", steps, "AdaBoost");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(5,1)", steps, "J48");
+		//		a.ClassifyDataNominal(new AdaBoostM1());
+		//		matrix = a.buildConfussionMatrix("AdaBoost");
+		//		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(5,1)", steps, "AdaBoost");
 		a.ClassifyDataNominal(new Logistic());
 		matrix = a.buildConfussionMatrix("Logistic");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(4,10)", steps, "Logistic");
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(5,1)", steps, "Logistic");
 		a.ClassifyDataNominal(new RandomForest());
 		matrix = a.buildConfussionMatrix("RandomForest");
-		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(4,10)", steps, "RandomForest");
-		
-		for (String s : accuracies) {
-			System.out.println(s);
-		}
+		u.metrics(matrix,classes_simb,"ALS",j,"Approach1(5,1)", steps, "RandomForest");
+
+		System.out.println(accuracies.get("Naive Bayes"));
+		System.out.println(accuracies.get("J48"));
+		System.out.println(accuracies.get("RandomForest"));
+		System.out.println(accuracies.get("Logistic"));
+		System.out.println(accuracies.get("AdaBoost"));
+
 	}
 
 	private void buildDataWithHMMPredictionsSorted() throws IOException {
@@ -132,7 +135,10 @@ public class Approach1HMM {
 				String[] split = line.split(",",-1);
 				String id = split[0];
 				String p = split[1];
-				e.put(id, p);
+				//TODO
+				if(!p.equals("NA")){
+					e.put(id, p);
+				}
 			}
 			predictionsHMM.put(examsHMM[i], e);
 			pred.close();
@@ -175,7 +181,7 @@ public class Approach1HMM {
 		}
 		System.out.println("\nAverage - "+ df.format(average/examsHMM.length) + " %");
 
-		
+
 	}
 
 
@@ -191,8 +197,8 @@ public class Approach1HMM {
 				if(line.contains("@attribute ALSFRS-RTotal")){
 					out.write("@attribute ALSFRS-RTotal {'{36-48}','{24-36}','{12-24}','{0-12}'}\n");
 				}else{
-//					String feat = line.split(" ")[1];
-//					out.write("@attribute "+ feat + " " + classes.get(feat) + '\n');
+					//					String feat = line.split(" ")[1];
+					//					out.write("@attribute "+ feat + " " + classes.get(feat) + '\n');
 					out.write(line+ '\n');
 				}
 			}else{
@@ -258,6 +264,8 @@ public class Approach1HMM {
 		System.out.println("\nCorrectly Classified Instances\t"+ tru +"\t\t" + df.format(accuracy*100) + " %");
 		System.out.println("Incorrectly Classified Instances\t"+ bad +"\t\t" + df.format(errorRate*100) + " %");
 		
+		accuracies.put(method,df.format(accuracy*100) + " %");
+
 		return matrix;
 	}
 
@@ -317,7 +325,7 @@ public class Approach1HMM {
 		//			System.out.println("\t-> "+d);
 		//		}
 	}
-	
+
 	private  void ChangeClassPreditions() {
 		System.out.println("changing class");
 		try {

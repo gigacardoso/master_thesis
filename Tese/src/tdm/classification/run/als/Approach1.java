@@ -34,7 +34,7 @@ public class Approach1 {
 	private  HashMap<Integer,DefaultHashMap<Integer,String>> vitalsAll = new HashMap<Integer,DefaultHashMap<Integer,String>>();
 	private  DefaultHashMap<String, String> heights = new DefaultHashMap<String, String>("");
 //	private HashMap<String, String> classes = new HashMap<String, String>();
-	private static  int steps = 3;
+	private static  int steps = 5;
 	private  int folds = 10;
 	private static String[] classes_simb = {"{0-12}","{12-24}","{24-36}","{36-48}"};
 
@@ -420,13 +420,15 @@ public class Approach1 {
 			patientWith = split[0]+"," + split[4]+"," + split[11]+"," + heights.get(split[0])+"," ;
 			patientWithout = split[0] + ","; 
 			int id = Integer.parseInt(split[0]);
-			patientWith += svc2.get(id) + "," + svc5.get(id) + "," + svc6.get(id) + "," + svc7.get(id) + ",";
-			patientWith += vitals2.get(id) +"," +vitals3.get(id) +"," +vitals6.get(id) +"," +vitals7.get(id) +"," +vitals8.get(id) +"," +vitals9.get(id);
-			patientWithout += svc2.get(id) + "," + svc5.get(id) + "," + svc6.get(id) + "," + svc7.get(id) + ",";
-			patientWithout += vitals2.get(id) +"," +vitals3.get(id) +"," +vitals6.get(id) +"," +vitals7.get(id) +"," +vitals8.get(id) +"," +vitals9.get(id);
-
-			outDemo.write(patientWith +","+'\n');
-			outNoDemo.write(patientWithout +","+'\n');
+			if(svc2.get(id) != null){
+				patientWith += svc2.get(id) + "," + svc5.get(id) + "," + svc6.get(id) + "," + svc7.get(id) + ",";
+				patientWith += vitals2.get(id) +"," +vitals3.get(id) +"," +vitals6.get(id) +"," +vitals7.get(id) +"," +vitals8.get(id) +"," +vitals9.get(id);
+				patientWithout += svc2.get(id) + "," + svc5.get(id) + "," + svc6.get(id) + "," + svc7.get(id) + ",";
+				patientWithout += vitals2.get(id) +"," +vitals3.get(id) +"," +vitals6.get(id) +"," +vitals7.get(id) +"," +vitals8.get(id) +"," +vitals9.get(id);
+	
+				outDemo.write(patientWith +","+'\n');
+				outNoDemo.write(patientWithout +","+'\n');
+			}
 		}
 		inDemo.close();
 		outDemo.close();
@@ -486,7 +488,7 @@ public class Approach1 {
 
 	private  void getHeight() throws IOException {
 
-		BufferedReader inVitals = new BufferedReader(new FileReader(path+steps+"_VITALS_DATA.csv"));
+		BufferedReader inVitals = new BufferedReader(new FileReader(path+"DiagnoseData.csv"));
 		String line1 = inVitals.readLine();
 
 		String last = null;
@@ -494,13 +496,13 @@ public class Approach1 {
 			String[] split = line1.split(",",-1);
 			if(null == last){
 				last = split[0];
-				heights.put(last, split[4]);
+				heights.put(last, split[3]);
 			}else{
 				if(last.equals(split[0])){
 					continue;
 				}else {
 					last = split[0];
-					heights.put(last, split[4]);
+					heights.put(last, split[3]);
 				}
 			}
 		}
