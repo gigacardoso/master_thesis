@@ -37,15 +37,18 @@ public class WeightedFMeasure {
 	private static String[] als_steps = {"3"	,"5",	"6"};
 
 	public static void main(String[] args) {
+		String[] metrics = {"F-measure","Precision", "Sensitivity","Specificity"};
 		try {
-//			createGraphFile(als,als_base,"ALS","F-measure",false,null);
-			createGraphFile(als,als_hmm,"ALS","F-measure",false,null);
-			createGraphFile(als,als_j48,"ALS","F-measure",true,null);
-			createGraphFile(als,als_linear,"ALS","F-measure",false,"Linear");
-//			createGraphFile(hep,base,"Hepatitis","F-measure",false,null);
-			createGraphFile(hep,hmm,"Hepatitis","F-measure",false,null);
-			createGraphFile(hep,j48,"Hepatitis","F-measure",false,null);
-			createGraphFile(hep,log,"Hepatitis","F-measure",false,null);
+			for (String met : metrics) {
+//				createGraphFile(als,als_base,"ALS",met,false,null);
+				createGraphFile(als,als_hmm,"ALS",met,false,null);
+				createGraphFile(als,als_j48,"ALS",met,true,null);
+				createGraphFile(als,als_linear,"ALS",met,false,"Linear");
+//				createGraphFile(hep,base,"Hepatitis",met,false,null);
+				createGraphFile(hep,hmm,"Hepatitis",met,false,null);
+				createGraphFile(hep,j48,"Hepatitis",met,false,null);
+				createGraphFile(hep,log,"Hepatitis",met,false,null);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
